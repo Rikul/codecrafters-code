@@ -1,19 +1,14 @@
-import os
 import sys
+import json
 
-from openai import OpenAI
-from app.tools.read_file import read_file, read_file_tool_spec
+from app.client import Client
+from app.tools.tool_calls import run_tool, read_file_tool_spec
 
-API_KEY = os.getenv("OPENROUTER_API_KEY")
-BASE_URL = os.getenv("OPENROUTER_BASE_URL", default="https://openrouter.ai/api/v1")
 
 class Agent:
 
     def __init__(self):
-        if not API_KEY:
-                raise RuntimeError("OPENROUTER_API_KEY is not set")
-
-        self.client = OpenAI(api_key=API_KEY, base_url=BASE_URL)
+        self.client = Client().get_client()
 
     def start_loop(self, prompt: str):
         
@@ -27,6 +22,20 @@ class Agent:
             raise RuntimeError("no choices in response")
 
         # You can use print statements as follows for debugging, they'll be visible when running tests.
-        print("Logs from your program will appear here!", file=sys.stderr)
+        print(f"chat.choices: {chat.choices}", file=sys.stderr)
 
-        print(chat.choices[0].message.content)
+        for choice in chat.choices:
+            if choice.message.role == "assistant" and len(choice.message.tool_calls) > 0:
+
+                for tool_call in choice.message.tool_calls:
+                    #print(f"tool_call: {tool_call} tool_name: {tool_call.function.name} ", file=sys.stderr)
+
+                    tool_name = tool_call.function.name
+                    tool_args = json.loads(tool_call.function.arguments)
+
+                    result = run_tool(tool_name=tool_name, tool_args=tool_args)
+                    print(result)
+
+            else:
+                print(chat.choices[0].message.content)
+
