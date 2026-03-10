@@ -2,8 +2,7 @@ import os
 import sys
 
 
-read_file_tool_spec = """
-{
+read_file_tool_spec = {
   "type": "function",
   "function": {
     "name": "Read",
@@ -20,7 +19,7 @@ read_file_tool_spec = """
     }
   }
 }
-"""
+
 
 
 def read_file(file_path: str) -> str:
