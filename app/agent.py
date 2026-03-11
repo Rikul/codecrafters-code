@@ -2,7 +2,7 @@ import sys
 import json
 
 from app.client import Client
-from app.tools.tool_calls import run_tool, read_file_tool_spec
+from app.tools.tool_calls import run_tool, read_file_tool_spec, write_file_tool_spec
 
 
 class Agent:
