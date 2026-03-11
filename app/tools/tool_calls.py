@@ -1,7 +1,7 @@
 from app.tools.read_file import read_file
 from app.tools.write_file import write_file
 
-tool_specs = {}
+tool_specs = {"read_file": None, "write_file": None, "bash": None}
 
 tool_specs["read_file"] = {
   "type": "function",
@@ -37,6 +37,24 @@ tool_specs["write_file"] = {
         "content": {
           "type": "string",
           "description": "The content to write to the file"
+        }
+      }
+    }
+  }
+}
+
+tool_specs["bash"] = {
+  "type": "function",
+  "function": {
+    "name": "bash",
+    "description": "Execute a shell command",
+    "parameters": {
+      "type": "object",
+      "required": ["command"],
+      "properties": {
+        "command": {
+          "type": "string",
+          "description": "The command to execute"
         }
       }
     }

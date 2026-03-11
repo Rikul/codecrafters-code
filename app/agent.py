@@ -18,7 +18,7 @@ class Agent:
             chat = self.client.chat.completions.create(
                 model="anthropic/claude-haiku-4.5",
                 messages=messages,
-                tools=[tool_specs["read_file"], tool_specs["write_file"]]
+                tools=[tool_specs["read_file"], tool_specs["write_file"], tool_specs["bash"]]
             )
 
             if not chat.choices or len(chat.choices) == 0:
