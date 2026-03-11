@@ -1,7 +1,9 @@
 from app.tools.read_file import read_file
 from app.tools.write_file import write_file
 
-read_file_tool_spec = {
+tool_specs = {}
+
+tool_specs["read_file"] = {
   "type": "function",
   "function": {
     "name": "read_file",
@@ -19,7 +21,7 @@ read_file_tool_spec = {
   }
 }
 
-write_file_tool_spec = {
+tool_specs["write_file"] = {
   "type": "function",
   "function": {
     "name": "write_file",

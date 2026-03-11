@@ -2,7 +2,7 @@ import sys
 import json
 
 from app.client import Client
-from app.tools.tool_calls import run_tool, read_file_tool_spec, write_file_tool_spec
+from app.tools.tool_calls import run_tool, tool_specs
 
 
 class Agent:
@@ -18,7 +18,7 @@ class Agent:
             chat = self.client.chat.completions.create(
                 model="anthropic/claude-haiku-4.5",
                 messages=messages,
-                tools=[read_file_tool_spec, write_file_tool_spec]
+                tools=[tool_specs["read_file"], tool_specs["write_file"]]
             )
 
             if not chat.choices or len(chat.choices) == 0:
