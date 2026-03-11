@@ -1,66 +1,12 @@
-from app.tools.read_file import read_file
-from app.tools.write_file import write_file
-from app.tools.bash import bash
+from app.tools.read_file import read_file, read_file_tool_spec
+from app.tools.write_file import write_file, write_file_tool_spec
+from app.tools.bash import bash, bash_tool_spec
 
-tool_specs = {"read_file": None, "write_file": None, "bash": None}
+tool_specs = {}
 
-tool_specs["read_file"] = {
-  "type": "function",
-  "function": {
-    "name": "read_file",
-    "description": "Read and return the contents of a file",
-    "parameters": {
-      "type": "object",
-      "properties": {
-        "file_path": {
-          "type": "string",
-          "description": "The path to the file to read"
-        }
-      },
-      "required": ["file_path"]
-    }
-  }
-}
-
-tool_specs["write_file"] = {
-  "type": "function",
-  "function": {
-    "name": "write_file",
-    "description": "Write content to a file",
-    "parameters": {
-      "type": "object",
-      "required": ["file_path", "content"],
-      "properties": {
-        "file_path": {
-          "type": "string",
-          "description": "The path of the file to write to"
-        },
-        "content": {
-          "type": "string",
-          "description": "The content to write to the file"
-        }
-      }
-    }
-  }
-}
-
-tool_specs["bash"] = {
-  "type": "function",
-  "function": {
-    "name": "bash",
-    "description": "Execute a shell command",
-    "parameters": {
-      "type": "object",
-      "required": ["command"],
-      "properties": {
-        "command": {
-          "type": "string",
-          "description": "The command to execute"
-        }
-      }
-    }
-  }
-}
+tool_specs["read_file"] = read_file_tool_spec
+tool_specs["write_file"] = write_file_tool_spec
+tool_specs["bash"] = bash_tool_spec
 
 def run_tool(tool_name: str, tool_args: dict):
 
