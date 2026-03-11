@@ -1,5 +1,6 @@
 from app.tools.read_file import read_file
 from app.tools.write_file import write_file
+from app.tools.bash import bash
 
 tool_specs = {"read_file": None, "write_file": None, "bash": None}
 
@@ -71,6 +72,10 @@ def run_tool(tool_name: str, tool_args: dict):
         file_path = tool_args["file_path"]
         content = tool_args["content"]
         return write_file(file_path=file_path, content=content)
+    
+    elif tool_name == "bash":
+        command = tool_args["command"]
+        return bash(command=command)
     
     else:
         return f"Error: unknown tool {tool_name}"
