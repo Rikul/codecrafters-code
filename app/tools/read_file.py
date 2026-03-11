@@ -21,8 +21,6 @@ read_file_tool_spec = {
 }
 
 def read_file(file_path: str) -> str:
-    #file_path = os.path.abspath(file_path)
-
     print(f"func: read_file, file_path: {file_path}", file=sys.stderr)
 
     if not os.path.exists(file_path):
