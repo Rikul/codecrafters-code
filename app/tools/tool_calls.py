@@ -1,12 +1,14 @@
 from app.tools.read_file import read_file, read_file_tool_spec
 from app.tools.write_file import write_file, write_file_tool_spec
 from app.tools.bash import bash, bash_tool_spec
+from app.tools.web_fetch import web_fetch, web_fetch_tool_spec
 
 tool_specs = {}
 
 tool_specs["read_file"] = read_file_tool_spec
 tool_specs["write_file"] = write_file_tool_spec
 tool_specs["bash"] = bash_tool_spec
+tool_specs["web_fetch"] = web_fetch_tool_spec
 
 def run_tool(tool_name: str, tool_args: dict):
 
@@ -22,6 +24,10 @@ def run_tool(tool_name: str, tool_args: dict):
     elif tool_name == "bash":
         command = tool_args["command"]
         return bash(command=command)
+    
+    elif tool_name == "web_fetch":
+        url = tool_args["url"]
+        return web_fetch(url=url)
     
     else:
         return f"Error: unknown tool {tool_name}"
