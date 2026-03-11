@@ -25,7 +25,9 @@ class Agent:
         print(f"chat.choices: {chat.choices}", file=sys.stderr)
 
         for choice in chat.choices:
-            if choice.message.role == "assistant" and len(choice.message.tool_calls) > 0:
+
+            if choice.message.tool_calls is not None:
+            #if choice.message.role == "assistant" and len(choice.message.tool_calls) > 0:
 
                 for tool_call in choice.message.tool_calls:
                     #print(f"tool_call: {tool_call} tool_name: {tool_call.function.name} ", file=sys.stderr)
