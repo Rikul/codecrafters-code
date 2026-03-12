@@ -26,5 +26,12 @@ def read_file(file_path: str) -> str:
     if not os.path.exists(file_path):
         return f"Error: file {file_path} does not exist"
     
-    with open(file_path, encoding = "utf-8") as f:
-        return f.read()
+    try:
+
+      with open(file_path, encoding = "utf-8") as f:
+          return f.read()
+
+    except Exception as e:
+        return f"Error reading file {file_path}: {e}"
+    
+    return ""

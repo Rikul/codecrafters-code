@@ -1,0 +1,310 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.container {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    padding: 30px;
+    max-width: 600px;
+    width: 100%;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+h1 {
+    color: #333;
+    font-size: 2.5em;
+    margin-bottom: 15px;
+}
+
+.stats {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    color: #666;
+    font-size: 1.1em;
+}
+
+.stats p {
+    display: flex;
+    gap: 8px;
+}
+
+.stats span {
+    font-weight: bold;
+    color: #667eea;
+}
+
+.controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    background: #667eea;
+    color: white;
+    font-size: 1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+.btn:hover {
+    background: #764ba2;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+select.btn {
+    appearance: none;
+    padding-right: 30px;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="white" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 5px center;
+    background-size: 24px;
+}
+
+.game-board {
+    display: flex;
+    justify-content: center;
+    margin: 30px 0;
+}
+
+.sudoku-grid {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 0;
+    background: #333;
+    padding: 2px;
+    border-radius: 5px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+.sudoku-cell {
+    width: 50px;
+    height: 50px;
+    background: white;
+    border: 1px solid #ddd;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5em;
+    font-weight: bold;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.sudoku-cell:hover {
+    background: #f0f0f0;
+}
+
+.sudoku-cell.given {
+    background: #e8e8e8;
+    cursor: default;
+    color: #333;
+    font-weight: 900;
+}
+
+.sudoku-cell.given:hover {
+    background: #e8e8e8;
+}
+
+.sudoku-cell.selected {
+    background: #667eea;
+    color: white;
+    font-weight: bold;
+}
+
+.sudoku-cell.related {
+    background: #e8f4ff;
+}
+
+.sudoku-cell.error {
+    background: #ffe8e8;
+    color: #d32f2f;
+}
+
+.sudoku-cell.hint {
+    background: #fff9e6;
+}
+
+/* Thick borders for 3x3 boxes */
+.sudoku-cell:nth-child(3n)::after {
+    content: '';
+    position: absolute;
+    right: -1px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #333;
+}
+
+.sudoku-cell:nth-child(27n)::before,
+.sudoku-cell:nth-child(27n+18)::before {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #333;
+}
+
+/* Corner cases for thick borders */
+.sudoku-cell:nth-child(1) {
+    border-top: 3px solid #333;
+    border-left: 3px solid #333;
+}
+
+.sudoku-cell:nth-child(9) {
+    border-top: 3px solid #333;
+    border-right: 3px solid #333;
+}
+
+.sudoku-cell:nth-child(73) {
+    border-left: 3px solid #333;
+    border-bottom: 3px solid #333;
+}
+
+.sudoku-cell:nth-child(81) {
+    border-right: 3px solid #333;
+    border-bottom: 3px solid #333;
+}
+
+/* Horizontal thick borders */
+.sudoku-cell:nth-child(1),
+.sudoku-cell:nth-child(2),
+.sudoku-cell:nth-child(3) {
+    border-top: 3px solid #333;
+}
+
+.sudoku-cell:nth-child(19),
+.sudoku-cell:nth-child(20),
+.sudoku-cell:nth-child(21) {
+    border-top: 3px solid #333;
+}
+
+.sudoku-cell:nth-child(37),
+.sudoku-cell:nth-child(38),
+.sudoku-cell:nth-child(39) {
+    border-top: 3px solid #333;
+}
+
+.sudoku-cell:nth-child(55),
+.sudoku-cell:nth-child(56),
+.sudoku-cell:nth-child(57) {
+    border-top: 3px solid #333;
+}
+
+.sudoku-cell:nth-child(73),
+.sudoku-cell:nth-child(74),
+.sudoku-cell:nth-child(75) {
+    border-top: 3px solid #333;
+    border-bottom: 3px solid #333;
+}
+
+/* Vertical thick borders */
+.sudoku-cell:nth-child(3n+1),
+.sudoku-cell:nth-child(3n+2),
+.sudoku-cell:nth-child(3n+3) {
+    border-right: 1px solid #ddd;
+}
+
+.sudoku-cell:nth-child(3n) {
+    border-right: 3px solid #333;
+}
+
+.sudoku-cell:nth-child(9n) {
+    border-right: 3px solid #333;
+}
+
+.info {
+    text-align: center;
+    margin-top: 25px;
+}
+
+#message {
+    font-size: 1.1em;
+    color: #667eea;
+    font-weight: 600;
+    margin-bottom: 15px;
+    min-height: 24px;
+}
+
+#message.success {
+    color: #4caf50;
+}
+
+#message.error {
+    color: #d32f2f;
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+    .container {
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 1.8em;
+    }
+
+    .sudoku-cell {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2em;
+    }
+
+    .controls {
+        gap: 5px;
+    }
+
+    .btn {
+        padding: 8px 12px;
+        font-size: 0.9em;
+    }
+
+    .stats {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+/* Input field styling */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
