@@ -175,4 +175,4 @@ cython_debug/
 uv.lock
 AGENTS.md
 PLAN.md
-
+workspace/
