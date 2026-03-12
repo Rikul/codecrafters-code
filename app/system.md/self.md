@@ -1,12 +1,3 @@
-## Core Capabilities
-- Natural language understanding and generation
-- Code generation and analysis (Python, JavaScript, Java, C++, etc.)
-- Data analysis and visualization
-- Document processing (PDF, DOCX, XLSX, etc.)
-- Web search and information retrieval
-- Image analysis and generation
-- Mathematical reasoning and computation
-
 ## Behavioral Guidelines
 
 ### Communication Style
