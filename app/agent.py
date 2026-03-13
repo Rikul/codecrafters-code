@@ -9,40 +9,40 @@ from app.display import console, log
 from rich.markdown import Markdown
 
 class Agent:
+    # Hardcode max iterations to prevent infinite loops during development
+    MAX_ITERATIONS = 100
 
     def __init__(self) -> None:
         self.client = Client().get_client()
-
-    def send_system_context(self):
-        system_context = load_system_context()
-        if system_context:
-            return self.client.chat.completions.create(
-                model=Config.get_model(),
-                messages=[{"role": "system", "content": system_context}]
-            )
+        self.messages: list[dict] = []
     
     def start_loop(self, message: str) -> None:
-
-        self.send_system_context()
         
-        messages = [{"role": "user", "content": message}]
-        while True:
+        messages = []
+
+        system_context = load_system_context()
+        if system_context:
+            self.messages.append({"role": "system", "content": system_context})
+
+        self.messages.append({"role": "user", "content": message})
+        tools = [tool["spec"] for tool in tool_registry.values()]
+
+       
+        iteration = 0
+        while iteration < self.MAX_ITERATIONS:
+            iteration += 1
 
             chat = self.client.chat.completions.create(
                 model=Config.get_model(),
-                messages=messages,
-                tools=[ tool_registry["read_file"]["spec"], 
-                        tool_registry["write_file"]["spec"], 
-                        tool_registry["bash"]["spec"], 
-                        tool_registry["web_fetch"]["spec"] ]
-
+                messages=self.messages,
+                tools=tools
             )
 
             if not chat.choices or len(chat.choices) == 0:
                 raise RuntimeError("no choices in response")
 
             assistant_message = chat.choices[0].message
-            messages.append(assistant_message)
+            self.messages.append(assistant_message)
 
 
             if assistant_message.tool_calls is not None:
@@ -54,9 +54,15 @@ class Agent:
 
                     tool_name = tool_call.function.name
                     tool_args = json.loads(tool_call.function.arguments)
+                    result = ""
 
-                    result = run_tool(tool_name=tool_name, tool_args=tool_args)
-                    messages.append({
+                    try:
+                        result = run_tool(tool_name=tool_name, tool_args=tool_args)
+                    except Exception as e:
+                        result = f"Error running tool {tool_name}: {str(e)}"
+                        log.error(result)
+
+                    self.messages.append({
                         "role": "tool", 
                         "tool_call_id": tool_call.id, 
                         "name": tool_name, 
