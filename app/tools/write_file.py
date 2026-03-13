@@ -28,7 +28,13 @@ def write_file(file_path: str, content: str) -> str:
     print(f"func: write_file, file_path: {file_path}", file=sys.stderr)
 
     ws_file_path = Config.WORKSPACE_DIR / file_path
-    
+
+    # Validate path stays within workspace
+    try:
+        ws_file_path.resolve().relative_to(Config.WORKSPACE_DIR.resolve())
+    except ValueError:
+        return f"Error: Path {file_path} attempts to write outside workspace"
+
     try:
     
       os.makedirs(ws_file_path.parent, exist_ok=True)

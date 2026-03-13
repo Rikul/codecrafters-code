@@ -2,13 +2,14 @@ import sys
 import json
 
 from app.client import Client
-from app.tools.tool_calls import run_tool, tool_specs
+from app.tools.tool_calls import run_tool, tool_registry
 from app.config import Config
 from app.helpers import load_system_context
+from app import console, err_console
 
 class Agent:
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.client = Client().get_client()
 
     def send_system_context(self):
@@ -19,7 +20,7 @@ class Agent:
                 messages=[{"role": "system", "content": system_context}]
             )
     
-    def start_loop(self, message: str):
+    def start_loop(self, message: str) -> None:
 
         self.send_system_context()
         
@@ -29,8 +30,11 @@ class Agent:
             chat = self.client.chat.completions.create(
                 model=Config.get_model(),
                 messages=messages,
-                tools=[ tool_specs["read_file"], tool_specs["write_file"], 
-                        tool_specs["bash"], tool_specs["web_fetch"]]
+                tools=[ tool_registry["read_file"]["spec"], 
+                        tool_registry["write_file"]["spec"], 
+                        tool_registry["bash"]["spec"], 
+                        tool_registry["web_fetch"]["spec"] ]
+
             )
 
             if not chat.choices or len(chat.choices) == 0:

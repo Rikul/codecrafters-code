@@ -24,6 +24,6 @@ def load_system_context() -> str:
                 print(f"Error loading system context file {filename}: {e}")
 
 
-    print(f"Loaded system context: {len(system_context)} lines\n{system_context[:1000]}...\n", file=sys.stderr)
+    print(f"Loaded system context: {len(system_context)} lines\n", file=sys.stderr)
 
     return system_context
