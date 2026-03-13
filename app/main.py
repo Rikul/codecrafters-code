@@ -1,6 +1,4 @@
 import argparse
-import os
-import sys
 
 from app.agent import Agent
 
