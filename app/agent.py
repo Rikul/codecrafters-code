@@ -5,7 +5,8 @@ from app.client import Client
 from app.tools.tool_calls import run_tool, tool_registry
 from app.config import Config
 from app.helpers import load_system_context
-from app import console, err_console
+from app.display import console, log
+from rich.markdown import Markdown
 
 class Agent:
 
@@ -43,9 +44,11 @@ class Agent:
             assistant_message = chat.choices[0].message
             messages.append(assistant_message)
 
-            print(f"assistant: {assistant_message.content}", file=sys.stderr)
 
             if assistant_message.tool_calls is not None:
+    
+                if assistant_message.content is not None and assistant_message.content.strip() != "":
+                    log.info(f"assistant: {assistant_message.content.strip()}")
 
                 for tool_call in assistant_message.tool_calls:
 
@@ -61,6 +64,6 @@ class Agent:
                     })                  
 
             else:
-                print(assistant_message.content)
+                console.print(Markdown(assistant_message.content))
                 break
 

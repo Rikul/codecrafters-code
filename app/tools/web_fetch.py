@@ -1,5 +1,6 @@
 import subprocess
 import sys
+from app.display import log
 
 web_fetch_tool_spec = {
   "type": "function",
@@ -20,7 +21,7 @@ web_fetch_tool_spec = {
 }
 
 def web_fetch(url: str) -> str:
-    print(f"func: web_fetch, url: {url}", file=sys.stderr)
+    log.info(f"web_fetch, url: {url}")
 
     try:
         result = subprocess.run(

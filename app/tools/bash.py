@@ -1,5 +1,6 @@
 import subprocess
 import sys
+from app.display import log
 
 bash_tool_spec = {
   "type": "function",
@@ -20,7 +21,7 @@ bash_tool_spec = {
 }
 
 def bash(command: str) -> str:
-    print(f"func: bash, command: {command}", file=sys.stderr)
+    log.info(f"bash, command: {command}")
 
     try:
         result = subprocess.run(command, shell=True, capture_output=True, text=True, check=False)

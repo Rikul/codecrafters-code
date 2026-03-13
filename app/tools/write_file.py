@@ -1,6 +1,7 @@
 import os
 import sys
 from app.config import Config
+from app.display import log
 
 write_file_tool_spec = {
   "type": "function",
@@ -25,7 +26,7 @@ write_file_tool_spec = {
 }
 
 def write_file(file_path: str, content: str) -> str:
-    print(f"func: write_file, file_path: {file_path}", file=sys.stderr)
+    log.info(f"write_file, file_path: {file_path}")
 
     ws_file_path = Config.WORKSPACE_DIR / file_path
 

@@ -1,6 +1,7 @@
 import os
 import sys
 from pathlib import Path
+from app.display import log
 
 def load_system_context() -> str:
     """
@@ -21,9 +22,9 @@ def load_system_context() -> str:
                     system_context += f'{separator}\n# {filename}\n{separator}\n\n{content}\n\n'
 
             except Exception as e:
-                print(f"Error loading system context file {filename}: {e}")
+                log.error(f"Error loading system context file {filename}: {e}")
 
 
-    print(f"Loaded system context: {len(system_context)} lines\n", file=sys.stderr)
+    log.info(f"Loaded system context: {len(system_context)} lines")
 
     return system_context

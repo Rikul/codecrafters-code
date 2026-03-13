@@ -1,6 +1,6 @@
 import os
 import sys
-
+from app.display import log
 
 read_file_tool_spec = {
   "type": "function",
@@ -21,7 +21,7 @@ read_file_tool_spec = {
 }
 
 def read_file(file_path: str) -> str:
-    print(f"func: read_file, file_path: {file_path}", file=sys.stderr)
+    log.info(f"read_file, file_path: {file_path}")
 
     if not os.path.exists(file_path):
         return f"Error: file {file_path} does not exist"
