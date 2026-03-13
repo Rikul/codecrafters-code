@@ -1,34 +1,145 @@
-[![progress-banner](https://backend.codecrafters.io/progress/claude-code/87d55c04-f776-4c90-acf6-0cdefeec742b)](https://app.codecrafters.io/users/codecrafters-bot?r=2qF)
 
-This is a starting point for Python solutions to the
-["Build Your own Claude Code" Challenge](https://codecrafters.io/challenges/claude-code).
+A CodeCrafters challenge project implementing a Claude Code-like AI agent with tool calling capabilities, built for the ["Build Your own Claude Code" Challenge](https://codecrafters.io/challenges/claude-code).
 
-Claude Code is an AI coding assistant that uses Large Language Models (LLMs) to
-understand code and perform actions through tool calls. In this challenge,
-you'll build your own Claude Code from scratch by implementing an LLM-powered
-coding assistant.
+## 🌟 Overview
 
-Along the way you'll learn about HTTP RESTful APIs, OpenAI-compatible tool
-calling, agent loop, and how to integrate multiple tools into an AI assistant.
+- Parse and execute user prompts
+- Make decisions about which tools to use
+- Interact with the file system (read, write)
+- Execute shell commands
+- Fetch web content
 
-**Note**: If you're viewing this repo on GitHub, head over to
-[codecrafters.io](https://codecrafters.io) to try the challenge.
+The implementation uses the OpenRouter API with OpenAI's client library and follows the CodeCrafters challenge requirements.
 
-# Passing the first stage
+## ✨ Features
 
-The entry point for your `claude-code` implementation is in `app/main.py`. Study
-and uncomment the relevant code, and submit to pass the first stage:
+- **Interactive CLI**: Command-line interface for interacting with the agent
+- **Tool Calling**: Multiple tools for file operations, web fetching, and shell commands
+  - `read_file`: Read contents of files
+  - `write_file`: Write content to files (with safety checks)
+  - `bash`: Execute shell commands
+  - `web_fetch`: Retrieve content from URLs
+- **System Context Loading**: Load personality and instructions from `system/` and `skills/` directories
+- **Error Handling**: Graceful error recovery and user-friendly messages
+- **Structured Output**: Rich terminal formatting for better UX
 
-```sh
-codecrafters submit
+## 📋 Prerequisites
+
+- Python 3.14 or higher
+- `uv` package manager (recommended) or pip
+- OpenRouter API key
+
+## 🚀 Installation
+
+### Using uv (Recommended)
+
+```bash
+# Install dependencies
+uv sync
+
+# Activate the virtual environment
+source .venv/bin/activate  # On Linux/Mac
+# or
+.venv\Scripts\activate  # On Windows
 ```
 
-# Stage 2 & beyond
+### Using pip
 
-Note: This section is for stages 2 and beyond.
+```bash
+pip install -r requirements.txt
+```
 
-1. Ensure you have `uv` installed locally.
-2. Run `./your_program.sh` to run your program, which is implemented in
-   `app/main.py`.
-3. Run `codecrafters submit` to submit your solution to CodeCrafters. Test
-   output will be streamed to your terminal.
+## ⚙️ Configuration
+
+Create a `.env` file in the project root with your OpenRouter credentials:
+
+```env
+OPENROUTER_API_KEY=your_api_key_here
+OPENROUTER_BASE_URL=https://openrouter.ai/api/v1  # Optional, default is set
+```
+
+**Note**: The `OPENROUTER_API_KEY` is **required**. You can obtain one from [OpenRouter](https://openrouter.ai/).
+
+## 🏃‍♂️ Usage
+
+### Running Locally
+
+The preferred way to run the agent locally:
+
+```bash
+./your_program.sh -p "Your prompt here"
+```
+
+For example:
+
+```bash
+./your_program.sh -p "List all Python files in the current directory"
+```
+
+This script sets up the proper `PYTHONPATH` and environment, then runs `uv run -m app.main`.
+
+### Direct uv command (equivalent)
+
+```bash
+uv run --project . --quiet -m app.main -p "Your prompt here"
+```
+
+### Example Session
+
+```bash
+$ ./your_program.sh -p "Create a Python script that calculates Fibonacci numbers"
+```
+
+The agent will:
+1. Analyze your request
+2. Decide which tools to use
+3. Create the file
+4. Report back with the results
+
+### Adding New Tools
+
+To add a new tool:
+
+1. Create a new file in `app/tools/` (e.g., `my_tool.py`)
+2. Define the tool specification and implementation
+3. Register it in `app/tools/tool_calls.py` (update `run_tool()` function)
+4. Add tests if applicable
+
+Example tool structure:
+
+```python
+def my_tool_spec():
+    return {
+        "type": "function",
+        "function": {
+            "name": "my_tool",
+            "description": "Tool description",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "param1": {
+                        "type": "string",
+                        "description": "Parameter description"
+                    }
+                },
+                "required": ["param1"]
+            }
+        }
+    }
+
+def my_tool(param1: str) -> str:
+    """Tool implementation."""
+    try:
+        # Do something
+        return "Success message"
+    except Exception as e:
+        return f"Error: {str(e)}"
+```
+
+## 📝 Future Improvements
+
+- Implement retry logic for API calls
+- Add more tools (git operations, code search, etc.)
+- Session persistence
+- Add streaming responses for better UX
+- Add comprehensive unit tests
