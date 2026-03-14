@@ -7,6 +7,7 @@ from app.config import Config
 from app.helpers import load_system_context
 from app.display import console, log
 from rich.markdown import Markdown
+from app.display import ask_permission
 
 class Agent:
     # Hardcode max iterations to prevent infinite loops during development
@@ -25,7 +26,7 @@ class Agent:
             self.messages.append({"role": "system", "content": system_context})
 
         self.messages.append({"role": "user", "content": message})
-        tools = [tool["spec"] for tool in tool_registry.values()]
+        tool_specs = [tool["spec"] for tool in tool_registry.values()]
 
        
         iteration = 0
@@ -35,7 +36,7 @@ class Agent:
             chat = self.client.chat.completions.create(
                 model=Config.get_model(),
                 messages=self.messages,
-                tools=tools
+                tools=tool_specs
             )
 
             if not chat.choices or len(chat.choices) == 0:
@@ -55,6 +56,15 @@ class Agent:
                     tool_name = tool_call.function.name
                     tool_args = json.loads(tool_call.function.arguments)
                     result = ""
+
+                    if not ask_permission(tool_name, tool_args):
+                        self.messages.append({
+                            "role": "tool",
+                            "tool_call_id": tool_call.id,
+                            "name": tool_name,
+                            "content": "User denied permission to run this tool"
+                        })
+                        continue
 
                     try:
                         result = run_tool(tool_name=tool_name, tool_args=tool_args)
