@@ -13,22 +13,20 @@ class Agent:
     # Hardcode max iterations to prevent infinite loops during development
     MAX_ITERATIONS = 100
 
-    def __init__(self) -> None:
+    def __init__(self, auto_approve: bool = False) -> None:
         self.client = Client().get_client()
         self.messages: list[dict] = []
-    
-    def start_loop(self, message: str, auto_approve: bool = False) -> None:
+        self.auto_approve = auto_approve
         
-        messages = []
-
         system_context = load_system_context()
         if system_context:
             self.messages.append({"role": "system", "content": system_context})
 
+    async def agent_loop(self, message: str) -> None:
+        
         self.messages.append({"role": "user", "content": message})
         tool_specs = [tool["spec"] for tool in tool_registry.values()]
 
-       
         iteration = 0
         while iteration < self.MAX_ITERATIONS:
             iteration += 1
@@ -49,7 +47,7 @@ class Agent:
             if assistant_message.tool_calls is not None:
     
                 if assistant_message.content is not None and assistant_message.content.strip() != "":
-                    log.info(f"assistant: {assistant_message.content.strip()}")
+                    console.print(Markdown(assistant_message.content))
 
                 for tool_call in assistant_message.tool_calls:
 
@@ -57,7 +55,7 @@ class Agent:
                     tool_args = json.loads(tool_call.function.arguments)
                     result = ""
 
-                    if not auto_approve and not ask_permission(tool_name, tool_args):
+                    if not self.auto_approve and not ask_permission(tool_name, tool_args):
                         self.messages.append({
                             "role": "tool",
                             "tool_call_id": tool_call.id,
@@ -80,6 +78,7 @@ class Agent:
                     })                  
 
             else:
-                console.print(Markdown(assistant_message.content))
+                if assistant_message.content:
+                    console.print(Markdown(assistant_message.content))
                 break
 
