@@ -20,12 +20,17 @@ async def main():
     p.add_argument("-p", dest="prompt", type=str, required=True, help="The initial prompt to start the agent with")
     p.add_argument("--auto-approve", dest="auto_approve", action="store_true", 
                    help="Allow the agent to call tools without asking for permission")
+    p.add_argument("--no-repl", dest="no_repl", action="store_true", 
+                   help="Run the agent with the initial prompt and then exit without starting the REPL")
     args = p.parse_args()
 
     session = PromptSession()
     agent = Agent(auto_approve=args.auto_approve)
 
     await agent.agent_loop(args.prompt)
+    if args.no_repl:
+        return
+    
     async for user_input in input_loop(session):
         await agent.agent_loop(user_input)
         
