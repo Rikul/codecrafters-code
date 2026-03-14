@@ -17,7 +17,7 @@ class Agent:
         self.client = Client().get_client()
         self.messages: list[dict] = []
     
-    def start_loop(self, message: str) -> None:
+    def start_loop(self, message: str, auto_approve: bool = False) -> None:
         
         messages = []
 
@@ -57,7 +57,7 @@ class Agent:
                     tool_args = json.loads(tool_call.function.arguments)
                     result = ""
 
-                    if not ask_permission(tool_name, tool_args):
+                    if not auto_approve and not ask_permission(tool_name, tool_args):
                         self.messages.append({
                             "role": "tool",
                             "tool_call_id": tool_call.id,
