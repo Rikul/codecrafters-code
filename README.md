@@ -1,5 +1,5 @@
 
-A CodeCrafters challenge project implementing a Claude Code-like AI agent with tool calling capabilities, built for the ["Build Your own Claude Code" Challenge](https://codecrafters.io/challenges/claude-code).
+A CodeCrafters challenge project implementing an AI agent with tool calling capabilities, built for the ["Build Your own Claude Code" Challenge](https://codecrafters.io/challenges/claude-code).
 
 ## 🌟 Overview
 
@@ -67,14 +67,24 @@ OPENROUTER_BASE_URL=https://openrouter.ai/api/v1  # Optional, default is set
 The preferred way to run the agent locally:
 
 ```bash
-./your_program.sh -p "Your prompt here"
-```
+./run.sh --help
+usage: python3 -m app.main [-h] -p PROMPT [--auto-approve] [--no-repl]
 
-For example:
+options:
+  -h, --help      show this help message and exit
+  -p PROMPT       The initial prompt to start the agent with
+  --auto-approve  Allow the agent to call tools without asking for permission
+  --no-repl       Run the agent with the initial prompt and then exit without starting the REPL
+```
 
 ```bash
-./your_program.sh -p "List all Python files in the current directory"
+./run.sh -p "Your prompt here"
 ```
+
+```bash
+./run.sh --no-repl -p "List all Python files in the current directory"
+```
+
 
 This script sets up the proper `PYTHONPATH` and environment, then runs `uv run -m app.main`.
 
