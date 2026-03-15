@@ -1,14 +1,11 @@
-import sys
-import os
 import json
 
 from app.client import Client
-from app.tools.tool_calls import run_tool, tool_registry
+from app.tool_calls import run_tool, tool_registry
 from app.config import Config
 from app.helpers import load_system_context
-from app.display import console, log
+from app.display import console, log, ask_permission
 from rich.markdown import Markdown
-from app.display import ask_permission
 
 class Agent:
     # Hardcode max iterations to prevent infinite loops during development
@@ -24,8 +21,6 @@ class Agent:
         if system_context:
             self.messages.append({"role": "system", "content": system_context})
 
-       
-
 
     async def agent_loop(self, message: str) -> None:
         
@@ -36,18 +31,18 @@ class Agent:
         while iteration < self.MAX_ITERATIONS:
             iteration += 1
 
-            chat = self.client.chat.completions.create(
-                model=Config.get_model(),
-                messages=self.messages,
-                tools=tool_specs
-            )
+            with console.status("[bold green]Processing...[/bold green]"):
+                chat = self.client.chat.completions.create(
+                    model=Config.get_model(),
+                    messages=self.messages,
+                    tools=tool_specs
+                )
 
             if not chat.choices or len(chat.choices) == 0:
                 raise RuntimeError("no choices in response")
 
             assistant_message = chat.choices[0].message
             self.messages.append(assistant_message)
-
 
             if assistant_message.tool_calls is not None:
     
@@ -67,8 +62,10 @@ class Agent:
                             "name": tool_name,
                             "content": "User denied permission to run this tool"
                         })
-                        continue
 
+                        # If the user denies tool calls, break out of the loop for user input
+                        return
+                    
                     try:
                         result = run_tool(tool_name=tool_name, tool_args=tool_args, workspace=self.workspace)
                     except Exception as e:

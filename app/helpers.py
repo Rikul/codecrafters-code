@@ -1,5 +1,4 @@
 import os
-import sys
 from pathlib import Path
 from app.display import log
 
@@ -9,7 +8,7 @@ def load_system_context() -> str:
     """
 
     system_context = ""
-    system_md_files = [ "self.md", "user.md",  "workspace.md", "tool_instructions.md" ]
+    system_md_files = [ "self.md", "user.md",  "workspace.md", "tool_instructions.md", "skills.md" ]
     system_context_dir = Path(__file__).parent / "system.md"
 
     for filename in system_md_files:

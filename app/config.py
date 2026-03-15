@@ -3,6 +3,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 HOME_DIR: Path = Path.home()
+APP_DIR: Path = Path(__file__).parent
 
 class Config:
 

@@ -1,7 +1,7 @@
 import argparse
 from prompt_toolkit import PromptSession
 from prompt_toolkit.patch_stdout import patch_stdout
-from app.display import log, status
+from app.display import log
 import asyncio
 
 from app.agent import Agent
@@ -38,8 +38,7 @@ async def main():
         return
     
     async for user_input in input_loop(session):
-        with status:
-            await agent.agent_loop(user_input)
+        await agent.agent_loop(user_input)
         
     
 if __name__ == "__main__":

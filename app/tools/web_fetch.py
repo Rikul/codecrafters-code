@@ -1,5 +1,4 @@
 import subprocess
-import sys
 from app.display import log
 
 web_fetch_tool_spec = {

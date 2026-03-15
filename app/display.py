@@ -4,8 +4,6 @@ from rich.logging import RichHandler
 from rich.prompt import Confirm
 
 console = Console()
-status = Console().status("[bold green]Processing...[/bold green]")
-
 
 logging.basicConfig(
     level=logging.INFO,

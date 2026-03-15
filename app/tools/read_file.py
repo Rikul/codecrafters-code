@@ -1,5 +1,4 @@
 import os
-import sys
 from app.display import log
 
 read_file_tool_spec = {

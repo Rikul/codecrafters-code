@@ -1,6 +1,4 @@
 import os
-import sys
-from app.config import Config
 from app.display import log
 
 write_file_tool_spec = {

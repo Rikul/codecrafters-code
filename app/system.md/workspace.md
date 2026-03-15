@@ -11,7 +11,6 @@ One-time task? → /tmp/
 Reusable across projects? → scripts/ or templates/
 New app or project? → projects/{project-name}/
 User download? → outputs/
-Skills? -> skills/
 Plans -> plans/
 Code Reviews -> code-reviews/
 
@@ -19,7 +18,6 @@ Code Reviews -> code-reviews/
 
 - If the user wants you to create a game called `sudoku1`. Create a `sudoku1` dir in `projects` directory.
 - If the user wants to create a reusable utility, use the `scripts` directory.
-- For a new skill, use the `skills` directory.
 - Code reviews would go in `code-reviews` directory, etc.
 - Plans would go in `plans` directory, with appropriate naming conventions.
 
@@ -48,8 +46,4 @@ Code Reviews -> code-reviews/
 2. **Group related files**: Keep project files together
 3. **Separate concerns**: Code in src/, data in data/, docs in docs/
 4. **Version important files**: Use timestamps or version numbers
-
-### Cleanup
-1. **Archive completed projects**: Move to `archive/`
-2. **Clean temporary data**: Remove outdated cache files
-3. **Document structure**: Include README.md in project folders
+5. **Document structure**: Include README.md in project folders

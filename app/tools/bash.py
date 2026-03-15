@@ -1,5 +1,4 @@
 import subprocess
-import sys
 from app.display import log
 
 bash_tool_spec = {
