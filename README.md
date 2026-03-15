@@ -68,13 +68,15 @@ The preferred way to run the agent locally:
 
 ```bash
 ./run.sh --help
-usage: python3 -m app.main [-h] -p PROMPT [--auto-approve] [--no-repl]
+usage: python3 -m app.main [-h] -p PROMPT [--auto-approve] [--no-repl] [--workspace WORKSPACE]
 
 options:
-  -h, --help      show this help message and exit
-  -p PROMPT       The initial prompt to start the agent with
-  --auto-approve  Allow the agent to call tools without asking for permission
-  --no-repl       Run the agent with the initial prompt and then exit without starting the REPL
+  -h, --help            show this help message and exit
+  -p PROMPT             The initial prompt to start the agent with
+  --auto-approve        Allow the agent to call tools without asking for permission
+  --no-repl             Run the agent with the initial prompt and then exit without starting the REPL
+  --workspace WORKSPACE
+                        The directory where the agent will work (default: current directory)
 ```
 
 ```bash

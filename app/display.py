@@ -4,6 +4,8 @@ from rich.logging import RichHandler
 from rich.prompt import Confirm
 
 console = Console()
+status = Console().status("[bold green]Processing...[/bold green]")
+
 
 logging.basicConfig(
     level=logging.INFO,
@@ -20,6 +22,5 @@ logging.getLogger("openai").setLevel(logging.WARNING)
 logging.getLogger("urllib3").setLevel(logging.WARNING)
 
 def ask_permission(tool_name: str, args: dict) -> bool:
-    console.print(f"\n[bold yellow]⚡ Tool Call Request[/bold yellow]")
-    console.print(f"   Tool: [cyan]{tool_name}[/cyan]   Args: {args}")
+    console.print(f"[bold yellow]⚡ Tool Call[/bold yellow]: [cyan]{tool_name}[/cyan]   Args: {args}")
     return Confirm.ask("Proceed?", default=True)

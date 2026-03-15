@@ -1,4 +1,5 @@
 import sys
+import os
 import json
 
 from app.client import Client
@@ -13,14 +14,18 @@ class Agent:
     # Hardcode max iterations to prevent infinite loops during development
     MAX_ITERATIONS = 100
 
-    def __init__(self, auto_approve: bool = False) -> None:
+    def __init__(self, auto_approve: bool = False, workspace: str = "") -> None:
         self.client = Client().get_client()
         self.messages: list[dict] = []
         self.auto_approve = auto_approve
-        
+        self.workspace = workspace
+
         system_context = load_system_context()
         if system_context:
             self.messages.append({"role": "system", "content": system_context})
+
+       
+
 
     async def agent_loop(self, message: str) -> None:
         
@@ -65,7 +70,7 @@ class Agent:
                         continue
 
                     try:
-                        result = run_tool(tool_name=tool_name, tool_args=tool_args)
+                        result = run_tool(tool_name=tool_name, tool_args=tool_args, workspace=self.workspace)
                     except Exception as e:
                         result = f"Error running tool {tool_name}: {str(e)}"
                         log.error(result)

@@ -28,11 +28,11 @@ write_file_tool_spec = {
 def write_file(file_path: str, content: str) -> str:
     log.info(f"write_file, file_path: {file_path}")
 
-    ws_file_path = Config.WORKSPACE_DIR / file_path
+    ws_file_path = os.getcwd() + "/" + file_path
 
     # Validate path stays within workspace
     try:
-        ws_file_path.resolve().relative_to(Config.WORKSPACE_DIR.resolve())
+        ws_file_path.resolve().relative_to(os.getcwd().resolve())
     except ValueError:
         return f"Error: Path {file_path} attempts to write outside workspace"
 
