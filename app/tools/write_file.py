@@ -1,5 +1,6 @@
 import os
 from app.display import log
+from pathlib import Path
 
 write_file_tool_spec = {
   "type": "function",
@@ -26,22 +27,15 @@ write_file_tool_spec = {
 def write_file(file_path: str, content: str) -> str:
     log.info(f"write_file, file_path: {file_path}")
 
-    ws_file_path = os.getcwd() + "/" + file_path
-
-    # Validate path stays within workspace
-    try:
-        ws_file_path.resolve().relative_to(os.getcwd().resolve())
-    except ValueError:
-        return f"Error: Path {file_path} attempts to write outside workspace"
-
     try:
     
-      os.makedirs(ws_file_path.parent, exist_ok=True)
+      os.makedirs(Path(file_path).parent, exist_ok=True)
 
-      with open(ws_file_path, "w", encoding = "utf-8") as f:
+      with open(file_path, "w", encoding = "utf-8") as f:
           f.write(content)
 
     except Exception as e:
-        return f"Error writing to file {ws_file_path}: {e}"
+        log.error(f"Error writing to file {file_path}: {e}")
+        return f"Error writing to file {file_path}: {e}"
       
-    return f"Successfully wrote to file: {ws_file_path}"
+    return f"Successfully wrote to file: {file_path}"

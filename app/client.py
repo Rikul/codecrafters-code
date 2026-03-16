@@ -1,12 +1,8 @@
 from openai import OpenAI
 import os
 
-from dotenv import load_dotenv
-
-load_dotenv()
-
-API_KEY = os.getenv("LLM_API_KEY")
-BASE_URL = os.getenv("LLM_BASE_URL", default="https://openrouter.ai/api/v1")
+API_KEY = os.environ.get("LLM_API_KEY")
+BASE_URL = os.environ.get("LLM_BASE_URL", default="https://openrouter.ai/api/v1")
 
 class Client:
 

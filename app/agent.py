@@ -8,14 +8,13 @@ from app.display import console, log, ask_permission
 from rich.markdown import Markdown
 
 class Agent:
-    # Hardcode max iterations to prevent infinite loops during development
-    MAX_ITERATIONS = 100
 
-    def __init__(self, auto_approve: bool = False, workspace: str = "") -> None:
+    def __init__(self, max_iterations: int, auto_approve: bool = False, workspace: str = "") -> None:
         self.client = Client().get_client()
         self.messages: list[dict] = []
         self.auto_approve = auto_approve
         self.workspace = workspace
+        self.max_iterations = max_iterations
 
         system_context = load_system_context()
         if system_context:
@@ -28,7 +27,7 @@ class Agent:
         tool_specs = [tool["spec"] for tool in tool_registry.values()]
 
         iteration = 0
-        while iteration < self.MAX_ITERATIONS:
+        while iteration < self.max_iterations:
             iteration += 1
 
             with console.status("[bold green]Processing...[/bold green]"):
@@ -62,9 +61,7 @@ class Agent:
                             "name": tool_name,
                             "content": "User denied permission to run this tool"
                         })
-
-                        # If the user denies tool calls, break out of the loop for user input
-                        return
+                        continue
                     
                     try:
                         result = run_tool(tool_name=tool_name, tool_args=tool_args, workspace=self.workspace)

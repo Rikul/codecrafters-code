@@ -22,8 +22,8 @@ def run_tool(tool_name: str, tool_args: dict, workspace: str = "") -> str:
         func = tool_registry[tool_name]["func"]
         result = func(**tool_args)
 
-    except Exception:
-        result = f"Error: tool error {tool_name}"
+    except Exception as e:
+        result = f"Error running tool {tool_name}: {str(e)}"
 
     os.chdir(original_cwd)
     return result

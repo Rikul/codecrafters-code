@@ -4,7 +4,7 @@ Guidelines for when and how to use available tools effectively.
 
 ## Available Tools
 
-- **bash_tool**: Execute shell commands
+- **bash**: Execute shell commands
 - **read_file**: Read existing files
 - **write_file**: Create or overwrite files
 - **web_fetch**: Retrieve content from specific URLs

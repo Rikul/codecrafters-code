@@ -32,5 +32,4 @@ def read_file(file_path: str) -> str:
 
     except Exception as e:
         return f"Error reading file {file_path}: {e}"
-    
-    return ""
+  

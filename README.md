@@ -19,6 +19,8 @@ The implementation uses the OpenRouter API with OpenAI's client library and foll
   - `write_file`: Write content to files (with safety checks)
   - `bash`: Execute shell commands
   - `web_fetch`: Retrieve content from URLs
+- **Skills**: 
+  - `puppeteer`: Browser Automation & Web Scraping
 - **System Context Loading**: Load personality and instructions from `system/` and `skills/` directories
 - **Error Handling**: Graceful error recovery and user-friendly messages
 - **Structured Output**: Rich terminal formatting for better UX
@@ -68,15 +70,15 @@ The preferred way to run the agent locally:
 
 ```bash
 ./run.sh --help
-usage: python3 -m app.main [-h] -p PROMPT [--auto-approve] [--no-repl] [--workspace WORKSPACE]
+usage: python3 -m app.main [-h] -p PROMPT [--auto-approve] [--no-repl] [--workspace path] [--max-iterations N]
 
 options:
-  -h, --help            show this help message and exit
-  -p PROMPT             The initial prompt to start the agent with
-  --auto-approve        Allow the agent to call tools without asking for permission
-  --no-repl             Run the agent with the initial prompt and then exit without starting the REPL
-  --workspace WORKSPACE
-                        The directory where the agent will work (default: current directory)
+  -h, --help           show this help message and exit
+  -p, --prompt PROMPT  The initial prompt for the agent
+  --auto-approve       Allow the agent to call tools without asking for permission
+  --no-repl            Run the agent with the initial prompt and then exit without starting the REPL
+  --workspace path     The directory where the agent will work (default: current directory)
+  --max-iterations N   The maximum number of iterations the agent will run before stopping (default: 100)
 ```
 
 ```bash
@@ -84,7 +86,7 @@ options:
 ```
 
 ```bash
-./run.sh --no-repl -p "List all Python files in the current directory"
+./run.sh --no-repl -p "List all Python files in the current directory" --workspace ~/src
 ```
 
 
@@ -151,7 +153,10 @@ def my_tool(param1: str) -> str:
 ## 📝 Future Improvements
 
 - Implement retry logic for API calls
-- Add more tools (git operations, code search, etc.)
+- Add useful tools and skills
 - Session persistence
 - Add streaming responses for better UX
 - Add comprehensive unit tests
+- Add response format option (e.g. json, markdown, plain text)
+- Add non-interactive mode where the agent runs without user input
+- Refactor config to toml

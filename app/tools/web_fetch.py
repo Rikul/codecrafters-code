@@ -34,9 +34,6 @@ def web_fetch(url: str) -> str:
             return f"Error fetching URL {url}: {result.stderr.strip()}"
         return result.stdout.strip()
 
-    except subprocess.CalledProcessError as e:
-        return f"Error fetching URL {url}: {e.stderr.strip()}"
-    
     except Exception as e:
         return f"Error fetching URL {url}: {str(e)}"
     

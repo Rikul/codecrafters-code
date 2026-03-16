@@ -24,6 +24,6 @@ def load_system_context() -> str:
                 log.error(f"Error loading system context file {filename}: {e}")
 
 
-    log.info(f"Loaded system context: {len(system_context)} lines")
+    log.info(f"Loaded system context: {len(system_context)} characters")
 
     return system_context
