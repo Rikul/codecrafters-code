@@ -26,7 +26,7 @@ def bash(command: str) -> str:
         result = subprocess.run(command, shell=True, capture_output=True, text=True, check=False, timeout=30)
         output = result.stdout
         if result.stderr:
-             output += f"\n[stderr]\n{result.stderr}"
+          output += f"\n[stderr]\n{result.stderr}"
         return output
 
     except Exception as e:

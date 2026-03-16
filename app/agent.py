@@ -50,32 +50,33 @@ class Agent:
 
                 for tool_call in assistant_message.tool_calls:
 
-                    tool_name = tool_call.function.name
-                    tool_args = json.loads(tool_call.function.arguments)
-                    result = ""
-
-                    if not self.auto_approve and not ask_permission(tool_name, tool_args):
-                        self.messages.append({
-                            "role": "tool",
-                            "tool_call_id": tool_call.id,
-                            "name": tool_name,
-                            "content": "User denied permission to run this tool"
-                        })
-                        continue
-                    
                     try:
+                        tool_name = tool_call.function.name
+                        tool_args = json.loads(tool_call.function.arguments)
+                        result = ""
+
+                        if not self.auto_approve and not ask_permission(tool_name, tool_args):
+                            self.messages.append({
+                                "role": "tool",
+                                "tool_call_id": tool_call.id,
+                                "name": tool_name,
+                                "content": "User denied permission to run this tool"
+                            })
+                            continue
+                        
                         result = run_tool(tool_name=tool_name, tool_args=tool_args, workspace=self.workspace)
+ 
                     except Exception as e:
                         result = f"Error running tool {tool_name}: {str(e)}"
                         log.error(result)
 
+                    
                     self.messages.append({
-                        "role": "tool", 
-                        "tool_call_id": tool_call.id, 
-                        "name": tool_name, 
-                        "content": result
-                    })                  
-
+                            "role": "tool", 
+                            "tool_call_id": tool_call.id, 
+                            "name": tool_name, 
+                            "content": result
+                    })
             else:
                 if assistant_message.content:
                     console.print(Markdown(assistant_message.content))

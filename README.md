@@ -56,11 +56,12 @@ pip install -r requirements.txt
 Create a `.env` file in the project root with your OpenRouter credentials:
 
 ```env
-OPENROUTER_API_KEY=your_api_key_here
-OPENROUTER_BASE_URL=https://openrouter.ai/api/v1  # Optional, default is set
+LLM_API_KEY=your_api_key_here
+LLM_BASE_URL=https://openrouter.ai/api/v1  # Optional, default is set
+LLM_MODEL=deepseek/deepseek-v3.2
 ```
 
-**Note**: The `OPENROUTER_API_KEY` is **required**. You can obtain one from [OpenRouter](https://openrouter.ai/).
+**Note**: The `LLM_API_KEY` is **required**. You can obtain one from [OpenRouter](https://openrouter.ai/).
 
 ## 🏃‍♂️ Usage
 

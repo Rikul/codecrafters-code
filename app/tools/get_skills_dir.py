@@ -13,10 +13,5 @@ get_skills_dir_tool_spec = {
 def get_skills_dir() -> str:
     log.info("get_skills_dir")
 
-    try:
-        skills_dir = pathlib.Path(__file__).parent.parent / "skills"
-        return str(skills_dir.resolve())
-    
-    except Exception as e:
-        return f"Error getting skills directory: {e}"
-    
+    skills_dir = pathlib.Path(__file__).parent.parent / "skills"
+    return str(skills_dir.resolve())
