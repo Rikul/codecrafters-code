@@ -1,4 +1,3 @@
-
 A CodeCrafters challenge project implementing an AI agent with tool calling capabilities, built for the ["Build Your own Claude Code" Challenge](https://codecrafters.io/challenges/claude-code).
 
 ## 🌟 Overview
@@ -27,7 +26,7 @@ The implementation uses the OpenRouter API with OpenAI's client library and foll
 
 ## 📋 Prerequisites
 
-- Python 3.14 or higher
+- Python 3.12 or higher
 - `uv` package manager (recommended) or pip
 - OpenRouter API key
 
@@ -91,7 +90,6 @@ options:
 ./run.sh --no-repl -p "List all Python files in the current directory" --workspace ~/src
 ```
 
-
 This script sets up the proper `PYTHONPATH` and environment, then runs `uv run -m app.main`.
 
 ### Direct uv command (equivalent)
@@ -112,7 +110,31 @@ The agent will:
 3. Create the file
 4. Report back with the results
 
-### Adding New Tools
+## 🧪 Testing
+
+### Running Tests
+
+```bash
+# Run all tests
+uv run pytest
+
+# Run specific test file
+uv run pytest tests/test_agent.py
+
+# Run with verbose output
+uv run pytest -v
+
+# Run tests with coverage
+uv run pytest --cov=app --cov-report=term-missing
+```
+
+### Test Structure
+
+- **Unit Tests**: Test individual components and tools
+- **Integration Tests**: Test end-to-end functionality in `tests/integration/`
+- **Mocking**: External API calls are mocked to avoid actual API usage
+
+## 🔧 Adding New Tools
 
 To add a new tool:
 
@@ -152,13 +174,71 @@ def my_tool(param1: str) -> str:
         return f"Error: {str(e)}"
 ```
 
+## 🐛 Troubleshooting
+
+### Common Issues
+
+1. **API Key Issues**: Ensure your `.env` file contains `LLM_API_KEY=your_key_here`
+2. **Python Version**: Ensure you have Python 3.12 or higher (`python --version`)
+3. **Permission Errors**: Make sure `run.sh` is executable (`chmod +x run.sh`)
+4. **Import Errors**: Run from project root or use `./run.sh` script
+
+### Debug Mode
+
+For debugging, you can add verbose output:
+
+```bash
+DEBUG=1 ./run.sh -p "Your prompt"
+```
+
+Or run the Python module directly:
+
+```bash
+uv run --project . --quiet -m app.main -p "Your prompt" --max-iterations 5
+```
+
 ## 📝 Future Improvements
 
 - Implement retry logic for API calls
-- Add useful tools and skills
+- Add more useful tools and skills
 - Session persistence
 - Add streaming responses for better UX
 - Add comprehensive unit tests
 - Add response format option (e.g. json, markdown, plain text)
 - Add non-interactive mode where the agent runs without user input
 - Refactor config to toml
+- Add support for additional LLM providers
+- Implement conversation history
+- Add file watching capabilities
+- Create GUI/web interface
+
+### Development Setup
+
+```bash
+# Clone the repository
+git clone <repository-url>
+cd codecrafters-claude-code
+
+# Install with development dependencies
+uv sync --dev
+
+# Run tests
+uv run pytest
+
+# Format code
+uv run ruff format app/ tests/
+
+# Lint code
+uv run ruff check app/ tests/
+```
+
+## 📄 License
+
+This project is part of the CodeCrafters "Build Your own Claude Code" Challenge. See the [CodeCrafters website](https://codecrafters.io) for more information about their challenges and licensing.
+
+## 🙏 Acknowledgments
+
+- [CodeCrafters](https://codecrafters.io) for the challenge platform
+- [OpenRouter](https://openrouter.ai) for LLM API access
+- [OpenAI](https://openai.com) for the client library interface
+- All contributors and testers
