@@ -108,7 +108,8 @@ async def test_agent_loop_respects_max_iterations():
     mock_client.chat.completions.create.return_value = mock_response
 
     with patch("app.agent.Config.get_model", return_value="test-model"):
-        await agent.agent_loop("run forever")
+        with patch("app.agent.run_tool", return_value="hi\n"):
+            await agent.agent_loop("run forever")
 
     # Should have stopped after max_iterations=3 LLM calls
     assert mock_client.chat.completions.create.call_count == 3
