@@ -71,7 +71,7 @@ The preferred way to run the agent locally:
 
 ```bash
 ./run.sh --help
-usage: python3 -m app.main [-h] -p PROMPT [--auto-approve] [--no-repl] [--workspace path] [--max-iterations N]
+usage: python3 -m app.main [-h] -p PROMPT [--auto-approve] [--no-repl] [--workspace path] [--max-iterations N] [--silent]
 
 options:
   -h, --help           show this help message and exit
@@ -80,6 +80,7 @@ options:
   --no-repl            Run the agent with the initial prompt and then exit without starting the REPL
   --workspace path     The directory where the agent will work (default: current directory)
   --max-iterations N   The maximum number of iterations the agent will run before stopping (default: 100)
+  --silent             Suppress all output except the final response (implies --auto-approve --no-repl)
 ```
 
 ```bash

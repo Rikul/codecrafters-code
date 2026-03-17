@@ -9,12 +9,13 @@ from rich.markdown import Markdown
 
 class Agent:
 
-    def __init__(self, max_iterations: int, auto_approve: bool = False, workspace: str = "") -> None:
+    def __init__(self, max_iterations: int, auto_approve: bool = False, workspace: str = "", silent: bool = False) -> None:
         self.client = Client().get_client()
         self.messages: list[dict] = []
         self.auto_approve = auto_approve
         self.workspace = workspace
         self.max_iterations = max_iterations
+        self.silent = silent
 
         system_context = load_system_context()
         if system_context:
@@ -30,12 +31,13 @@ class Agent:
         while iteration < self.max_iterations:
             iteration += 1
 
-            with console.status("[bold green]Processing...[/bold green]"):
-                chat = self.client.chat.completions.create(
-                    model=Config.get_model(),
-                    messages=self.messages,
-                    tools=tool_specs
-                )
+            log.info("sending message to model...")
+            chat = self.client.chat.completions.create(
+                model=Config.get_model(),
+                messages=self.messages,
+                tools=tool_specs,
+                response_format={"type": "text"} if self.silent else None
+            )
 
             if not chat.choices or len(chat.choices) == 0:
                 raise RuntimeError("no choices in response")
@@ -45,7 +47,7 @@ class Agent:
 
             if assistant_message.tool_calls is not None:
     
-                if assistant_message.content is not None and assistant_message.content.strip() != "":
+                if not self.silent and assistant_message.content is not None and assistant_message.content.strip() != "":
                     console.print(Markdown(assistant_message.content))
 
                 for tool_call in assistant_message.tool_calls:
@@ -79,6 +81,9 @@ class Agent:
                     })
             else:
                 if assistant_message.content:
-                    console.print(Markdown(assistant_message.content))
+                    if self.silent:
+                        print(assistant_message.content)
+                    else:
+                        console.print(Markdown(assistant_message.content))
                 break
 

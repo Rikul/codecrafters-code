@@ -3,6 +3,7 @@ import argparse
 from prompt_toolkit import PromptSession
 from prompt_toolkit.patch_stdout import patch_stdout
 import asyncio
+import logging
 
 from dotenv import load_dotenv
 # Load environment variables from .env file
@@ -18,7 +19,7 @@ async def input_loop(session: PromptSession):
                 user_input = await session.prompt_async("› ")
             yield user_input
         except (EOFError, KeyboardInterrupt):
-            print("Exiting...")
+            log.info("Exiting...")
             break
 
 async def main():
@@ -34,34 +35,39 @@ async def main():
                    help="The directory where the agent will work (default: current directory)")
     p.add_argument("--max-iterations", metavar="N", dest="max_iterations", type=int, default=100,
                    help="The maximum number of iterations the agent will run before stopping (default: 100)")
-    
+    p.add_argument("--silent", dest="silent", action="store_true",
+                   help="Suppress all output except the final response (implies --auto-approve --no-repl)")
+
     args = p.parse_args()
     
     # validate workspace
     if args.workspace:
         if os.path.exists(args.workspace) and not os.path.isdir(args.workspace):
-            print(f"Workspace path {args.workspace} is not a directory")
+            log.error(f"Workspace path {args.workspace} is not a directory")
             return
         
         if not os.path.exists(args.workspace):
             try:
                 os.makedirs(args.workspace)
             except Exception as e:
-                print(f"Error creating workspace directory {args.workspace}: {e}")
+                log.error(f"Error creating workspace directory {args.workspace}: {e}")
                 return
 
     # validate max_iterations
     if args.max_iterations <= 0:
-        print("max_iterations must be a positive integer")
+        log.error("max_iterations must be a positive integer")
         return
     
+    if args.silent:
+        log.setLevel(logging.WARNING)
+
     session = PromptSession()
-    agent = Agent(auto_approve=args.auto_approve, workspace=args.workspace, max_iterations=args.max_iterations)
+    agent = Agent(auto_approve=args.auto_approve or args.silent, workspace=args.workspace, max_iterations=args.max_iterations, silent=args.silent)
 
     log.info("Starting agent...")
     await agent.agent_loop(args.prompt)
     
-    if args.no_repl:
+    if args.no_repl or args.silent:
         return
     
     async for user_input in input_loop(session):
