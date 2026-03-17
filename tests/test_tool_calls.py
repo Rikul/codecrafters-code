@@ -1,0 +1,44 @@
+import os
+import pytest
+from unittest.mock import patch, MagicMock
+
+from app.tool_calls import run_tool, tool_registry
+
+
+def test_tool_registry_contains_expected_tools():
+    assert "read_file" in tool_registry
+    assert "write_file" in tool_registry
+    assert "bash" in tool_registry
+    assert "web_fetch" in tool_registry
+    assert "get_skills_dir" in tool_registry
+
+
+def test_tool_registry_entries_have_spec_and_func():
+    for name, entry in tool_registry.items():
+        assert "spec" in entry, f"{name} missing 'spec'"
+        assert "func" in entry, f"{name} missing 'func'"
+        assert callable(entry["func"]), f"{name} 'func' is not callable"
+
+
+def test_run_tool_calls_correct_function(tmp_path):
+    file_path = str(tmp_path / "test.txt")
+    with open(file_path, "w", encoding="utf-8") as f:
+        f.write("content")
+    result = run_tool("read_file", {"file_path": file_path})
+    assert result == "content"
+
+
+def test_run_tool_restores_cwd_after_workspace_change(tmp_path):
+    original_cwd = os.getcwd()
+    run_tool("bash", {"command": "pwd"}, workspace=str(tmp_path))
+    assert os.getcwd() == original_cwd
+
+
+def test_run_tool_unknown_tool_returns_error():
+    result = run_tool("nonexistent_tool", {})
+    assert "Error" in result
+
+
+def test_run_tool_passes_workspace_as_cwd(tmp_path):
+    result = run_tool("bash", {"command": "pwd"}, workspace=str(tmp_path))
+    assert str(tmp_path) in result
