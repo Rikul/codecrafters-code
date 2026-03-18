@@ -200,7 +200,7 @@ uv run --project . --quiet -m app.main -p "Your prompt" --max-iterations 5
 ## 📝 Future Improvements
 
 - Implement retry logic for API calls
-- Add more useful tools and skills
+- Add more useful tools and skills (todo tasks, mcp, etc.)
 - Session persistence
 - Add streaming responses for better UX
 - Add comprehensive unit tests

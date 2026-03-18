@@ -31,8 +31,8 @@ class Agent:
         while iteration < self.max_iterations:
             iteration += 1
 
-            log.info("sending message to model...")
-            chat = self.client.chat.completions.create(
+            log.info("chat.completions.create...")
+            chat = await self.client.chat.completions.create(
                 model=Config.get_model(),
                 messages=self.messages,
                 tools=tool_specs,

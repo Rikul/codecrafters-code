@@ -1,4 +1,4 @@
-from openai import OpenAI
+from openai import AsyncOpenAI
 import os
 
 API_KEY = os.environ.get("LLM_API_KEY")
@@ -10,7 +10,7 @@ class Client:
         if not API_KEY and not api_key:
             raise RuntimeError("API_KEY is not set")
 
-        self.client = OpenAI(api_key=api_key, base_url=base_url)
+        self.client = AsyncOpenAI(api_key=api_key, base_url=base_url)
 
     def get_client(self):
         return self.client
