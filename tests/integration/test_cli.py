@@ -9,8 +9,9 @@ production.
 
 import logging
 import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, AsyncMock
 
+import app.config as config_module
 from app.main import main
 from app.display import log as app_log
 
@@ -36,10 +37,10 @@ async def test_cli_with_simple_prompt(capsys):
     The test uses ``--silent`` so that the final answer is written to stdout
     via ``print()``, making it straightforward to capture and assert on.
     It mocks only the OpenAI client; all other layers (argparse, Agent,
-    agent_loop, Config, …) run for real.
+    agent_loop, config, …) run for real.
     """
     mock_openai = MagicMock()
-    mock_openai.chat.completions.create.return_value = _make_llm_response("Hello, world!")
+    mock_openai.chat.completions.create = AsyncMock(return_value=_make_llm_response("Hello, world!"))
 
     # --silent sets the module-level log level; restore it after the test so
     # other tests that check the default level are not affected.
@@ -48,7 +49,8 @@ async def test_cli_with_simple_prompt(capsys):
         with patch("sys.argv", ["prog", "-p", "say hello", "--silent"]), \
              patch("app.agent.Client") as MockClient, \
              patch("app.agent.load_system_context", return_value=""), \
-             patch("app.agent.Config.get_model", return_value="test-model"):
+             patch("app.main.config.load"), \
+             patch.object(config_module, "_config", {"agent": {"model": "test-model"}}):
 
             MockClient.return_value.get_client.return_value = mock_openai
             await main()
@@ -63,7 +65,7 @@ async def test_cli_with_simple_prompt(capsys):
     # The OpenAI client was called exactly once (no tool calls → single iteration)
     mock_openai.chat.completions.create.assert_called_once()
 
-    # The call used the model name returned by Config.get_model
+    # The call used the model name from config
     _, call_kwargs = mock_openai.chat.completions.create.call_args
     assert call_kwargs["model"] == "test-model"
 

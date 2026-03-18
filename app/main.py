@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
+import app.config as config
 from app.display import log
 from app.agent import Agent
 
@@ -61,6 +62,7 @@ async def main():
     if args.silent:
         log.setLevel(logging.WARNING)
 
+    config.load()
     session = PromptSession()
     agent = Agent(auto_approve=args.auto_approve or args.silent, workspace=args.workspace, max_iterations=args.max_iterations, silent=args.silent)
 

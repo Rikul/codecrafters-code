@@ -1,8 +1,8 @@
 import json
 
+import app.config as config
 from app.client import Client
 from app.tool_calls import run_tool, tool_registry
-from app.config import Config
 from app.helpers import load_system_context
 from app.display import console, log, ask_permission
 from rich.markdown import Markdown
@@ -33,7 +33,7 @@ class Agent:
 
             log.info("chat.completions.create...")
             chat = await self.client.chat.completions.create(
-                model=Config.get_model(),
+                model=config.agent["model"],
                 messages=self.messages,
                 tools=tool_specs,
                 response_format={"type": "text"} if self.silent else None
