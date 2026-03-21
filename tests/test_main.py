@@ -155,65 +155,6 @@ async def test_main_silent_implies_auto_approve():
 
 
 @pytest.mark.asyncio
-async def test_main_returns_early_when_workspace_is_not_a_directory(tmp_path):
-    file_path = tmp_path / "not_a_dir.txt"
-    file_path.write_text("content")
-
-    agent_mock = MagicMock()
-    agent_mock.agent_loop = AsyncMock()
-    patches, _ = _patch_main(["-p", "hi", "--no-repl", "--workspace", str(file_path)], agent_mock=agent_mock)
-
-    for p in patches:
-        p.start()
-    try:
-        await main()
-    finally:
-        for p in patches:
-            p.stop()
-
-    agent_mock.agent_loop.assert_not_called()
-
-
-@pytest.mark.asyncio
-async def test_main_creates_workspace_directory_if_missing(tmp_path):
-    new_dir = str(tmp_path / "brand_new_workspace")
-    agent_mock = MagicMock()
-    agent_mock.agent_loop = AsyncMock()
-    patches, _ = _patch_main(["-p", "hi", "--no-repl", "--workspace", new_dir], agent_mock=agent_mock)
-
-    for p in patches:
-        p.start()
-    try:
-        await main()
-    finally:
-        for p in patches:
-            p.stop()
-
-    import os
-    assert os.path.isdir(new_dir)
-    agent_mock.agent_loop.assert_called_once()
-
-
-@pytest.mark.asyncio
-async def test_main_returns_early_when_makedirs_fails(tmp_path):
-    new_dir = str(tmp_path / "will_fail")
-    agent_mock = MagicMock()
-    agent_mock.agent_loop = AsyncMock()
-    patches, _ = _patch_main(["-p", "hi", "--no-repl", "--workspace", new_dir], agent_mock=agent_mock)
-
-    for p in patches:
-        p.start()
-    try:
-        with patch("os.makedirs", side_effect=OSError("permission denied")):
-            await main()
-    finally:
-        for p in patches:
-            p.stop()
-
-    agent_mock.agent_loop.assert_not_called()
-
-
-@pytest.mark.asyncio
 async def test_main_returns_early_when_max_iterations_is_zero():
     agent_mock = MagicMock()
     agent_mock.agent_loop = AsyncMock()

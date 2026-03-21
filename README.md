@@ -70,14 +70,13 @@ The preferred way to run the agent locally:
 
 ```bash
 ./run.sh --help
-usage: python3 -m app.main [-h] -p PROMPT [--auto-approve] [--no-repl] [--workspace path] [--max-iterations N] [--silent]
+usage: python3 -m app.main [-h] -p PROMPT [--auto-approve] [--no-repl] [--max-iterations N] [--silent]
 
 options:
   -h, --help           show this help message and exit
   -p, --prompt PROMPT  The initial prompt for the agent
   --auto-approve       Allow the agent to call tools without asking for permission
   --no-repl            Run the agent with the initial prompt and then exit without starting the REPL
-  --workspace path     The directory where the agent will work (default: current directory)
   --max-iterations N   The maximum number of iterations the agent will run before stopping (default: 100)
   --silent             Suppress all output except the final response (implies --auto-approve --no-repl)
 ```
@@ -87,7 +86,7 @@ options:
 ```
 
 ```bash
-./run.sh --no-repl -p "List all Python files in the current directory" --workspace ~/src
+./run.sh --no-repl -p "List all Python files in the current directory"
 ```
 
 This script sets up the proper `PYTHONPATH` and environment, then runs `uv run -m app.main`.

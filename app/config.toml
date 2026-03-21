@@ -1,2 +1,2 @@
-[agent]
-model = "deepseek/deepseek-v3.2"
+model = "stepfun/step-3.5-flash:free"
+max_iterations = 100

@@ -151,4 +151,4 @@ async def test_agent_loop_runs_tool_when_auto_approve():
     with patch("app.agent.run_tool", return_value="hi\n") as mock_run_tool:
         await agent.agent_loop("say hi")
 
-    mock_run_tool.assert_called_once_with(tool_name="bash", tool_args={"command": "echo hi"}, workspace="")
+    mock_run_tool.assert_called_once_with(tool_name="bash", tool_args={"command": "echo hi"})

@@ -28,17 +28,6 @@ def test_run_tool_calls_correct_function(tmp_path):
     assert result == "content"
 
 
-def test_run_tool_restores_cwd_after_workspace_change(tmp_path):
-    original_cwd = os.getcwd()
-    run_tool("bash", {"command": "pwd"}, workspace=str(tmp_path))
-    assert os.getcwd() == original_cwd
-
-
 def test_run_tool_unknown_tool_returns_error():
     result = run_tool("nonexistent_tool", {})
     assert "Error" in result
-
-
-def test_run_tool_passes_workspace_as_cwd(tmp_path):
-    result = run_tool("bash", {"command": "pwd"}, workspace=str(tmp_path))
-    assert str(tmp_path) in result

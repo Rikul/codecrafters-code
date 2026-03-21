@@ -49,8 +49,3 @@ def test_getattr_raises_for_missing_key(tmp_path):
     with pytest.raises(AttributeError, match="Config has no attribute"):
         _ = config.nonexistent_key
 
-
-def test_load_defaults_to_config_toml():
-    config.load()
-    assert isinstance(config.get("agent"), dict)
-    assert "model" in config.get("agent")

@@ -2,7 +2,7 @@
 
 These tests exercise the full pipeline from ``main()`` all the way through
 ``Agent`` and ``agent_loop``.  Only the external OpenAI HTTP client is
-mocked so that every internal layer (argument parsing, workspace validation,
+mocked so that every internal layer (argument parsing, 
 agent construction, iteration logic, tool dispatch) runs as it would in
 production.
 """
@@ -50,7 +50,7 @@ async def test_cli_with_simple_prompt(capsys):
              patch("app.agent.Client") as MockClient, \
              patch("app.agent.load_system_context", return_value=""), \
              patch("app.main.config.load"), \
-             patch.object(config_module, "_config", {"agent": {"model": "test-model"}}):
+             patch.object(config_module, "_config", {"model": "test-model"}):
 
             MockClient.return_value.get_client.return_value = mock_openai
             await main()

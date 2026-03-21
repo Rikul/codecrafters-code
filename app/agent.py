@@ -9,11 +9,10 @@ from rich.markdown import Markdown
 
 class Agent:
 
-    def __init__(self, max_iterations: int, auto_approve: bool = False, workspace: str = "", silent: bool = False) -> None:
+    def __init__(self, max_iterations: int, auto_approve: bool = False, silent: bool = False) -> None:
         self.client = Client().get_client()
         self.messages: list[dict] = []
         self.auto_approve = auto_approve
-        self.workspace = workspace
         self.max_iterations = max_iterations
         self.silent = silent
 
@@ -33,7 +32,7 @@ class Agent:
 
             log.info("chat.completions.create...")
             chat = await self.client.chat.completions.create(
-                model=config.agent["model"],
+                model=config.get("model", "deepseek/deepseek-v3.2"),
                 messages=self.messages,
                 tools=tool_specs,
                 response_format={"type": "text"} if self.silent else None
@@ -66,7 +65,7 @@ class Agent:
                             })
                             continue
                         
-                        result = run_tool(tool_name=tool_name, tool_args=tool_args, workspace=self.workspace)
+                        result = run_tool(tool_name=tool_name, tool_args=tool_args)
  
                     except Exception as e:
                         result = f"Error running tool {tool_name}: {str(e)}"

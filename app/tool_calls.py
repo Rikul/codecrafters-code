@@ -13,11 +13,9 @@ tool_registry = {
     "get_skills_dir": { "spec": get_skills_dir_tool_spec, "func": get_skills_dir }
 }
 
-def run_tool(tool_name: str, tool_args: dict, workspace: str = "") -> str:
+def run_tool(tool_name: str, tool_args: dict) -> str:
     original_cwd = os.getcwd()
-    if workspace:
-        os.chdir(workspace)
-
+    
     try:
         func = tool_registry[tool_name]["func"]
         result = func(**tool_args)

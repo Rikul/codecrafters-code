@@ -1,13 +1,12 @@
 # Workspace Configuration
 
 ## Overview
-The workspace directory is your persistent storage area for project files, data, and outputs that need to survive across sessions.
+The workspace directory is your persistent storage area for project files, data, and outputs that need to survive across sessions. The workspace directory depends on current configuration. The workspace could be current directory, `.workspace` directory in the project root or `.workspace` directory in the user's home directory. If no directory is provided, you SHOULD ask for it.
 
 ## How to Use Workspace
 
 ### File Location Decision Tree
 
-One-time task? → /tmp/
 Reusable across projects? → scripts/ or templates/
 New app or project? → projects/{project-name}/
 User download? → outputs/
