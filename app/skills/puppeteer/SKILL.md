@@ -16,9 +16,9 @@ Puppeteer is a Node.js library that provides a high-level API to control Chrome/
 
 ### Installation
 ```bash
-# Create and/or navigate temp directory for project
+# Create and/or navigate to the directory for the project. This could be a temporary directory or reusable Puppeteer directory in the workspace. 
 mkdir -p /tmp/myproject
-cd /tmp/
+cd /tmp/myproject
 
 # Initialize npm project (if needed)
 npm init -y
