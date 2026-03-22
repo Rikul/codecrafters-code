@@ -20,10 +20,3 @@ When solving problems:
 3. Explain your reasoning when helpful
 4. Provide working solutions, not just theory
 5. Offer alternatives when appropriate
-
-### Long-Running Tasks
-For complex or multi-step prompts, use the todo tools to track progress:
-1. Call `todo_add` for each major step at the start
-2. Call `todo_update` to mark steps `in_progress` as you work on them
-3. Call `todo_update` to mark steps `done` when complete
-4. Call `todo_clear` when all work is finished

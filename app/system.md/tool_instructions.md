@@ -13,13 +13,68 @@ Guidelines for when and how to use available tools effectively.
 - **todo_update**: Update a task's status (`task_id`, `status`: `todo` | `in_progress` | `done`)
 - **todo_clear**: Clear all todos when the work is complete
 
-### Quality Checks
+## Todo Tool Guidelines
+
+### When to Use Todo Tools
+
+**✅ Use Todo Tools For:**
+- **Long-running tasks** that span multiple steps
+- **Complex projects** where progress needs tracking
+- **Multi-phase work** with dependencies between steps
+- **Large refactoring** where you need to track what's been done
+- **Project planning** before diving into execution
+
+**❌ Don't Use Todo Tools For:**
+- Simple one-off commands
+- Tasks that complete within a few tool calls
+- When working memory alone is sufficient
+- For tasks that should persist beyond the current session
+
+### How to Use Todo Tools Effectively
+
+1. **Plan First**: 
+   - Use `todo_add` at the beginning of complex work
+   - Break large tasks into 3-7 manageable subtasks
+   - Add optional descriptions for clarity
+
+2. **Track Progress**:
+   - Update tasks to `in_progress` when you start working on them
+   - Update to `done` when completed
+   - Use `todo_list` periodically to check overall progress
+
+3. **Clean Up**:
+   - Use `todo_clear` when all work is complete
+   - Clear before starting a new major project to avoid confusion
+
+### Example Workflow
+
+```
+todo_add "Set up project structure", "Create directories and basic files"
+todo_add "Implement core functionality", "Write main algorithm"
+todo_add "Add tests", "Create unit tests for the new feature"
+todo_add "Update documentation", "Update README and inline docs"
+
+# Work on tasks, updating as you go
+todo_update "1" "in_progress"
+# ... do the work ...
+todo_update "1" "done"
+todo_update "2" "in_progress"
+# ... etc.
+
+# Check progress
+todo_list()
+
+# When all done
+todo_clear()
+```
+
+## Quality Checks
 - Validate tool outputs before using them
 - Verify file creation succeeded
 - Check command exit codes
 - Confirm URLs are accessible before fetching
 
-### Error Recovery
+## Error Recovery
 1. Identify the failure point
 2. Check error messages for root cause
 3. Try alternative approach if available
