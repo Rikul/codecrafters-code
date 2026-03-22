@@ -14,6 +14,7 @@ def make_mock_client(tool_calls=None, content="Hello!", finish_reason="stop"):
 
     mock_choice = MagicMock()
     mock_choice.message = mock_message
+    mock_choice.finish_reason = finish_reason
 
     mock_chat = MagicMock()
     mock_chat.choices = [mock_choice]
@@ -102,6 +103,7 @@ async def test_agent_loop_respects_max_iterations():
 
     mock_choice = MagicMock()
     mock_choice.message = mock_message
+    mock_choice.finish_reason = "tool_calls"
 
     mock_response = MagicMock()
     mock_response.choices = [mock_choice]
@@ -134,6 +136,7 @@ async def test_agent_loop_runs_tool_when_auto_approve():
     msg_with_tool.content = None
     choice_with_tool = MagicMock()
     choice_with_tool.message = msg_with_tool
+    choice_with_tool.finish_reason = "tool_calls"
     response_with_tool = MagicMock()
     response_with_tool.choices = [choice_with_tool]
 
@@ -143,6 +146,7 @@ async def test_agent_loop_runs_tool_when_auto_approve():
     msg_plain.content = "done"
     choice_plain = MagicMock()
     choice_plain.message = msg_plain
+    choice_plain.finish_reason = "stop"
     response_plain = MagicMock()
     response_plain.choices = [choice_plain]
 
@@ -152,3 +156,37 @@ async def test_agent_loop_runs_tool_when_auto_approve():
         await agent.agent_loop("say hi")
 
     mock_run_tool.assert_called_once_with(tool_name="bash", tool_args={"command": "echo hi"})
+
+
+@pytest.mark.asyncio
+async def test_agent_loop_continues_when_finish_reason_not_stop():
+    with patch("app.agent.Client") as MockClient:
+        mock_client = MagicMock()
+        MockClient.return_value.get_client.return_value = mock_client
+        with patch("app.agent.load_system_context", return_value=""):
+            agent = Agent(auto_approve=True, silent=True, max_iterations=10)
+    agent.client = mock_client
+
+    msg_partial = MagicMock()
+    msg_partial.tool_calls = None
+    msg_partial.content = "partial"
+    choice_partial = MagicMock()
+    choice_partial.message = msg_partial
+    choice_partial.finish_reason = "length"
+    response_partial = MagicMock()
+    response_partial.choices = [choice_partial]
+
+    msg_final = MagicMock()
+    msg_final.tool_calls = None
+    msg_final.content = "final"
+    choice_final = MagicMock()
+    choice_final.message = msg_final
+    choice_final.finish_reason = "stop"
+    response_final = MagicMock()
+    response_final.choices = [choice_final]
+
+    mock_client.chat.completions.create = AsyncMock(side_effect=[response_partial, response_final])
+
+    await agent.agent_loop("continue")
+
+    assert mock_client.chat.completions.create.call_count == 2

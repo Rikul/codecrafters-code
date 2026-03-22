@@ -8,6 +8,10 @@ Guidelines for when and how to use available tools effectively.
 - **read_file**: Read existing files
 - **write_file**: Create or overwrite files
 - **web_fetch**: Retrieve content from specific URLs
+- **todo_add**: Add a task to the todo list (`title`, optional `description`)
+- **todo_list**: List all tasks and their statuses
+- **todo_update**: Update a task's status (`task_id`, `status`: `todo` | `in_progress` | `done`)
+- **todo_clear**: Clear all todos when the work is complete
 
 ### Quality Checks
 - Validate tool outputs before using them

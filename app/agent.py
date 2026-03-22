@@ -35,13 +35,19 @@ class Agent:
                 model=config.get("model", "deepseek/deepseek-v3.2"),
                 messages=self.messages,
                 tools=tool_specs,
-                response_format={"type": "text"} if self.silent else None
+                response_format={"type": "text"} if self.silent else None,
+                max_tokens=config.get("max_tokens", 16384)
             )
 
             if not chat.choices or len(chat.choices) == 0:
                 raise RuntimeError("no choices in response")
 
-            assistant_message = chat.choices[0].message
+            choice = chat.choices[0]
+            assistant_message = choice.message
+            finish_reason = getattr(choice, "finish_reason", None)
+            if not isinstance(finish_reason, str):
+                finish_reason = None
+
             self.messages.append(assistant_message)
 
             if assistant_message.tool_calls is not None:
@@ -84,5 +90,7 @@ class Agent:
                         print(assistant_message.content)
                     else:
                         console.print(Markdown(assistant_message.content))
-                break
+
+                if finish_reason in ("stop", None):
+                    break
 

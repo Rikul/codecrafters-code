@@ -3,6 +3,12 @@ from app.tools.write_file import write_file, write_file_tool_spec
 from app.tools.bash import bash, bash_tool_spec
 from app.tools.web_fetch import web_fetch, web_fetch_tool_spec
 from app.tools.get_skills_dir import get_skills_dir, get_skills_dir_tool_spec
+from app.tools.todo import (
+    todo_add, todo_add_tool_spec,
+    todo_list, todo_list_tool_spec,
+    todo_update, todo_update_tool_spec,
+    todo_clear, todo_clear_tool_spec,
+)
 import os
 
 tool_registry = {
@@ -10,7 +16,11 @@ tool_registry = {
     "write_file":   { "spec": write_file_tool_spec, "func": write_file },
     "bash":         { "spec": bash_tool_spec,       "func": bash },
     "web_fetch":    { "spec": web_fetch_tool_spec,  "func": web_fetch },
-    "get_skills_dir": { "spec": get_skills_dir_tool_spec, "func": get_skills_dir }
+    "get_skills_dir": { "spec": get_skills_dir_tool_spec, "func": get_skills_dir },
+    "todo_add":    { "spec": todo_add_tool_spec,    "func": todo_add },
+    "todo_list":   { "spec": todo_list_tool_spec,   "func": todo_list },
+    "todo_update": { "spec": todo_update_tool_spec, "func": todo_update },
+    "todo_clear":  { "spec": todo_clear_tool_spec,  "func": todo_clear },
 }
 
 def run_tool(tool_name: str, tool_args: dict) -> str:
