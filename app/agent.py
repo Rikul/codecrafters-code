@@ -6,8 +6,7 @@ import app.config as config
 from app.client import Client
 from app.tool_calls import run_tool, tool_registry
 from app.helpers import load_system_context
-from app.display import console, log, ask_permission
-from rich.markdown import Markdown
+from app.display import log, ask_permission
 
 class Agent:
 
@@ -55,7 +54,7 @@ class Agent:
             if assistant_message.tool_calls is not None:
     
                 if not self.silent and assistant_message.content is not None and assistant_message.content.strip() != "":
-                    console.print(Markdown(assistant_message.content))
+                    print(assistant_message.content.strip())
 
                 for tool_call in assistant_message.tool_calls:
 
@@ -87,11 +86,8 @@ class Agent:
                             "content": result
                     })
             else:
-                if assistant_message.content:
-                    if self.silent:
-                        print(assistant_message.content)
-                    else:
-                        console.print(Markdown(assistant_message.content))
+                if assistant_message.content.strip() != "":
+                    print(assistant_message.content)
 
                 if finish_reason in ("stop", None):
                     break
