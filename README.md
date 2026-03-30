@@ -7,6 +7,7 @@ A CodeCrafters challenge project implementing an AI agent with tool calling capa
 - Interact with the file system (read, write)
 - Execute shell commands
 - Fetch web content
+- Track tasks with todo system
 
 The implementation uses the OpenRouter API with OpenAI's client library and follows the CodeCrafters challenge requirements.
 
@@ -18,10 +19,14 @@ The implementation uses the OpenRouter API with OpenAI's client library and foll
   - `write_file`: Write content to files (with safety checks)
   - `bash`: Execute shell commands
   - `web_fetch`: Retrieve content from URLs
-- **Skills**: 
+  - `get_skills_dir`: Locate skills directory
+  - **Todo Tools**: `todo_add`, `todo_list`, `todo_update`, `todo_clear` for task tracking
+- **Skills System**: 
   - `puppeteer`: Browser Automation & Web Scraping
+  - Skills located in `app/skills/` directory
 - **System Context Loading**: Load personality and instructions from `system/` and `skills/` directories
 - **Error Handling**: Graceful error recovery and user-friendly messages
+- **Workspace Support**: Configurable workspace for persistent storage
 
 ## 📋 Prerequisites
 
@@ -51,21 +56,34 @@ pip install -r requirements.txt
 
 ## ⚙️ Configuration
 
+### 1. API Configuration (Required)
+
 Create a `.env` file in the project root with your OpenRouter credentials:
 
 ```env
 LLM_API_KEY=your_api_key_here
 LLM_BASE_URL=https://openrouter.ai/api/v1  # Optional, default is set
-LLM_MODEL=deepseek/deepseek-v3.2
 ```
 
 **Note**: The `LLM_API_KEY` is **required**. You can obtain one from [OpenRouter](https://openrouter.ai/).
 
+### 2. Agent Configuration
+
+Configure the agent behavior in `app/config.toml`:
+
+```toml
+model = "deepseek/deepseek-v3.2"  # Model to use
+max_iterations = 100              # Maximum iterations per prompt
+max_tokens = 32768                # Maximum tokens per response
+```
+
+### 3. Workspace Configuration (Optional)
+
+The workspace provides persistent storage across sessions. Configure workspace settings as needed.
+
 ## 🏃‍♂️ Usage
 
-### Running Locally
-
-The preferred way to run the agent locally:
+### Running the Agent
 
 ```bash
 ./run.sh --help
@@ -80,26 +98,26 @@ options:
   --silent             Suppress all output except the final response (implies --auto-approve --no-repl)
 ```
 
+### Basic Examples
+
 ```bash
+# Interactive session with a prompt
 ./run.sh -p "Your prompt here"
-```
 
-```bash
+# Single execution without REPL
 ./run.sh --no-repl -p "List all Python files in the current directory"
-```
 
-This script sets up the proper `PYTHONPATH` and environment, then runs `uv run -m app.main`.
+# Silent mode (no interactive questions, single execution)
+./run.sh --silent -p "Create a README.md file"
 
-### Direct uv command (equivalent)
-
-```bash
-uv run --project . --quiet -m app.main -p "Your prompt here"
+# With custom iteration limit
+./run.sh -p "Complex task" --max-iterations 50
 ```
 
 ### Example Session
 
 ```bash
-$ ./your_program.sh -p "Create a Python script that calculates Fibonacci numbers"
+$ ./run.sh -p "Create a Python script that calculates Fibonacci numbers"
 ```
 
 The agent will:
@@ -107,6 +125,50 @@ The agent will:
 2. Decide which tools to use
 3. Create the file
 4. Report back with the results
+
+### Todo System Example
+
+The agent can track tasks using the todo tools:
+
+```bash
+$ ./run.sh -p "Plan and execute a project setup"
+```
+
+The agent might:
+1. Add todo tasks using `todo_add`
+2. Work on tasks and update status with `todo_update`
+3. List progress with `todo_list`
+4. Clear tasks when done with `todo_clear`
+
+## 🔧 Available Tools
+
+| Tool | Description | Example Use |
+|------|-------------|-------------|
+| `read_file` | Read file contents | Read configuration files |
+| `write_file` | Write to files | Create scripts, documentation |
+| `bash` | Execute shell commands | File operations, installations |
+| `web_fetch` | Fetch web content | Research, data collection |
+| `get_skills_dir` | Locate skills directory | Load specialized skills |
+| `todo_add` | Add a todo task | Project planning |
+| `todo_list` | List all tasks | Progress tracking |
+| `todo_update` | Update task status | Mark tasks as done |
+| `todo_clear` | Clear all todos | Reset task tracking |
+
+## 🧪 Skills System
+
+### Using Skills
+
+Skills provide expert guidance for specialized tasks. The agent can load skills from `app/skills/{skill-name}/SKILL.md`.
+
+**Available Skills:**
+- **puppeteer**: Browser automation, web scraping, screenshot capture, PDF generation
+
+### Adding New Skills
+
+To add a new skill:
+1. Create directory `app/skills/{skill-name}/`
+2. Add `SKILL.md` with skill instructions
+3. The agent can load it using `get_skills_dir` tool
 
 ## 🧪 Testing
 
@@ -132,7 +194,9 @@ uv run pytest --cov=app --cov-report=term-missing
 - **Integration Tests**: Test end-to-end functionality in `tests/integration/`
 - **Mocking**: External API calls are mocked to avoid actual API usage
 
-## 🔧 Adding New Tools
+## 🔧 Development
+
+### Adding New Tools
 
 To add a new tool:
 
@@ -172,40 +236,6 @@ def my_tool(param1: str) -> str:
         return f"Error: {str(e)}"
 ```
 
-## 🐛 Troubleshooting
-
-### Common Issues
-
-1. **API Key Issues**: Ensure your `.env` file contains `LLM_API_KEY=your_key_here`
-2. **Python Version**: Ensure you have Python 3.12 or higher (`python --version`)
-3. **Permission Errors**: Make sure `run.sh` is executable (`chmod +x run.sh`)
-4. **Import Errors**: Run from project root or use `./run.sh` script
-
-### Debug Mode
-
-For debugging, you can add verbose output:
-
-```bash
-DEBUG=1 ./run.sh -p "Your prompt"
-```
-
-Or run the Python module directly:
-
-```bash
-uv run --project . --quiet -m app.main -p "Your prompt" --max-iterations 5
-```
-
-## 📝 Future Improvements
-
-- Implement retry logic for API calls
-- Add more useful tools and skills (todo tasks, mcp, etc.)
-- Session persistence
-- Add streaming responses for better UX
-- Add support for additional LLM providers
-- Implement conversation history
-- Add file watching capabilities
-- Create GUI/web interface
-
 ### Development Setup
 
 ```bash
@@ -225,6 +255,56 @@ uv run ruff format app/ tests/
 # Lint code
 uv run ruff check app/ tests/
 ```
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+1. **API Key Issues**: Ensure your `.env` file contains `LLM_API_KEY=your_key_here`
+2. **Python Version**: Ensure you have Python 3.12 or higher (`python --version`)
+3. **Configuration Issues**: Check `app/config.toml` exists with proper settings
+4. **Permission Errors**: Make sure `run.sh` is executable (`chmod +x run.sh`)
+5. **Import Errors**: Run from project root or use `./run.sh` script
+
+### Debug Mode
+
+For debugging, you can run with verbose output:
+
+```bash
+# Direct execution with debug
+uv run --project . --quiet -m app.main -p "Your prompt" --max-iterations 5
+```
+
+## 📝 Project Structure
+
+```
+.
+├── app/                    # Application code
+│   ├── skills/            # Skill definitions
+│   │   └── puppeteer/     # Puppeteer skill
+│   ├── tools/             # Tool implementations
+│   ├── config.toml        # Agent configuration
+│   ├── config.py          # Configuration loader
+│   ├── agent.py           # Main agent logic
+│   └── main.py            # CLI entry point
+├── tests/                 # Test suite
+├── .env                   # API credentials (create)
+├── config.toml            # Model settings
+├── pyproject.toml         # Python project config
+├── run.sh                 # Main execution script
+└── README.md              # This file
+```
+
+## 📝 Future Improvements
+
+- Implement retry logic for API calls
+- Add more useful tools and skills (todo tasks, mcp, etc.)
+- Session persistence
+- Add streaming responses for better UX
+- Add support for additional LLM providers
+- Implement conversation history
+- Add file watching capabilities
+- Create GUI/web interface
 
 ## 📄 License
 
