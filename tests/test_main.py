@@ -2,9 +2,9 @@ import sys
 import logging
 import pytest
 from unittest.mock import patch, MagicMock, AsyncMock, call
-from prompt_toolkit import PromptSession
 
-from app.main import input_loop, main
+from app.input import input_loop
+from app.main import main
 
 
 # ---------------------------------------------------------------------------
@@ -13,37 +13,45 @@ from app.main import input_loop, main
 
 @pytest.mark.asyncio
 async def test_input_loop_yields_user_input():
-    session = MagicMock(spec=PromptSession)
-    session.prompt_async = AsyncMock(side_effect=["hello", "world", EOFError()])
+    """Test that input_loop yields user input"""
+    with patch("builtins.input", side_effect=["hello", "world", EOFError()]):
+        results = []
+        async for value in input_loop():
+            results.append(value)
+    
+    assert results == ["hello", "world"]
 
-    results = []
-    async for value in input_loop(session):
-        results.append(value)
 
+@pytest.mark.asyncio
+async def test_input_loop_skips_empty_input():
+    """Test that input_loop skips empty user input"""
+    with patch("builtins.input", side_effect=["", "hello", "", "world", EOFError()]):
+        results = []
+        async for value in input_loop():
+            results.append(value)
+    
     assert results == ["hello", "world"]
 
 
 @pytest.mark.asyncio
 async def test_input_loop_stops_on_eof():
-    session = MagicMock(spec=PromptSession)
-    session.prompt_async = AsyncMock(side_effect=[EOFError()])
-
-    results = []
-    async for value in input_loop(session):
-        results.append(value)
-
+    """Test that input_loop stops on EOF"""
+    with patch("builtins.input", side_effect=[EOFError()]):
+        results = []
+        async for value in input_loop():
+            results.append(value)
+    
     assert results == []
 
 
 @pytest.mark.asyncio
 async def test_input_loop_stops_on_keyboard_interrupt():
-    session = MagicMock(spec=PromptSession)
-    session.prompt_async = AsyncMock(side_effect=[KeyboardInterrupt()])
-
-    results = []
-    async for value in input_loop(session):
-        results.append(value)
-
+    """Test that input_loop stops on KeyboardInterrupt"""
+    with patch("builtins.input", side_effect=[KeyboardInterrupt()]):
+        results = []
+        async for value in input_loop():
+            results.append(value)
+    
     assert results == []
 
 
@@ -63,8 +71,8 @@ def _patch_main(argv, agent_mock=None):
 
     patches = [
         patch("sys.argv", ["prog"] + argv),
-        patch("app.main.Agent", return_value=agent_mock),
-        patch("app.main.PromptSession"),
+        patch("app.agent.Agent", return_value=agent_mock),
+        patch("app.input.input_loop", return_value=AsyncMock()),
     ]
     return patches, agent_mock
 
@@ -75,6 +83,7 @@ def _patch_main(argv, agent_mock=None):
 
 @pytest.mark.asyncio
 async def test_main_calls_agent_loop_with_prompt():
+    """Test that main calls agent_loop with the prompt"""
     agent_mock = MagicMock()
     agent_mock.agent_loop = AsyncMock()
     patches, _ = _patch_main(["-p", "say hello", "--no-repl"], agent_mock=agent_mock)
@@ -92,6 +101,7 @@ async def test_main_calls_agent_loop_with_prompt():
 
 @pytest.mark.asyncio
 async def test_main_no_repl_exits_after_first_agent_loop():
+    """Test that main with --no-repl exits after first agent_loop"""
     agent_mock = MagicMock()
     agent_mock.agent_loop = AsyncMock()
     patches, _ = _patch_main(["-p", "hi", "--no-repl"], agent_mock=agent_mock)
@@ -109,6 +119,7 @@ async def test_main_no_repl_exits_after_first_agent_loop():
 
 @pytest.mark.asyncio
 async def test_main_silent_exits_after_first_agent_loop():
+    """Test that main with --silent exits after first agent_loop"""
     agent_mock = MagicMock()
     agent_mock.agent_loop = AsyncMock()
     patches, _ = _patch_main(["-p", "hi", "--silent"], agent_mock=agent_mock)
@@ -126,6 +137,7 @@ async def test_main_silent_exits_after_first_agent_loop():
 
 @pytest.mark.asyncio
 async def test_main_silent_sets_log_level_to_warning():
+    """Test that --silent sets log level to WARNING"""
     agent_mock = MagicMock()
     agent_mock.agent_loop = AsyncMock()
     patches, _ = _patch_main(["-p", "hi", "--silent"], agent_mock=agent_mock)
@@ -144,10 +156,11 @@ async def test_main_silent_sets_log_level_to_warning():
 
 @pytest.mark.asyncio
 async def test_main_silent_implies_auto_approve():
+    """Test that --silent implies auto_approve=True"""
     MockAgent = MagicMock()
     MockAgent.return_value.agent_loop = AsyncMock()
 
-    with patch("sys.argv", ["prog", "-p", "hi", "--silent"]), patch("app.main.Agent", MockAgent), patch("app.main.PromptSession"):
+    with patch("sys.argv", ["prog", "-p", "hi", "--silent"]), patch("app.agent.Agent", MockAgent):
         await main()
 
     _, kwargs = MockAgent.call_args
@@ -156,6 +169,7 @@ async def test_main_silent_implies_auto_approve():
 
 @pytest.mark.asyncio
 async def test_main_returns_early_when_max_iterations_is_zero():
+    """Test that main returns early when max_iterations is 0"""
     agent_mock = MagicMock()
     agent_mock.agent_loop = AsyncMock()
     patches, _ = _patch_main(["-p", "hi", "--no-repl", "--max-iterations", "0"], agent_mock=agent_mock)
@@ -173,6 +187,7 @@ async def test_main_returns_early_when_max_iterations_is_zero():
 
 @pytest.mark.asyncio
 async def test_main_returns_early_when_max_iterations_is_negative():
+    """Test that main returns early when max_iterations is negative"""
     agent_mock = MagicMock()
     agent_mock.agent_loop = AsyncMock()
     patches, _ = _patch_main(["-p", "hi", "--no-repl", "--max-iterations", "-5"], agent_mock=agent_mock)
@@ -190,17 +205,17 @@ async def test_main_returns_early_when_max_iterations_is_negative():
 
 @pytest.mark.asyncio
 async def test_main_repl_calls_agent_loop_for_each_input():
+    """Test that main REPL calls agent_loop for each input"""
     agent_mock = MagicMock()
     agent_mock.agent_loop = AsyncMock()
 
-    async def fake_input_loop(session):
+    async def fake_input_loop():
         for msg in ["second", "third"]:
             yield msg
 
     with patch("sys.argv", ["prog", "-p", "first"]), \
-         patch("app.main.Agent", return_value=agent_mock), \
-         patch("app.main.PromptSession"), \
-         patch("app.main.input_loop", fake_input_loop):
+         patch("app.agent.Agent", return_value=agent_mock), \
+         patch("app.input.input_loop", fake_input_loop):
         await main()
 
     assert agent_mock.agent_loop.call_count == 3

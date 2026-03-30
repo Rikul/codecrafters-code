@@ -22,7 +22,6 @@ The implementation uses the OpenRouter API with OpenAI's client library and foll
   - `puppeteer`: Browser Automation & Web Scraping
 - **System Context Loading**: Load personality and instructions from `system/` and `skills/` directories
 - **Error Handling**: Graceful error recovery and user-friendly messages
-- **Structured Output**: Rich terminal formatting for better UX
 
 ## 📋 Prerequisites
 

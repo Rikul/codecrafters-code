@@ -8,14 +8,14 @@ async def input_loop() -> str:
     
     while True:
         try:
-
             user_input = await loop.run_in_executor(None, lambda: input("> "))
             print("", end="\r")  # clean up line
 
             if user_input.strip():
                 yield user_input
 
+        except (EOFError, KeyboardInterrupt):
+            # Stop the loop on EOF or Ctrl+C
+            break
         except asyncio.CancelledError:
             raise KeyboardInterrupt
-        
-        

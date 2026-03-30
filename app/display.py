@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import logging
 
-from rich.prompt import Confirm
-
 RESET  = "\033[0m"
 DIM    = "\033[2m"
 GREEN  = "\033[32m"
