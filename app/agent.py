@@ -68,7 +68,7 @@ class Agent:
                                 "role": "tool",
                                 "tool_call_id": tool_call.id,
                                 "name": tool_name,
-                                "content": "User denied permission to run this tool"
+                                "content": "User denied permission to run this tool. Ask for permission to run the tool again if you want to try running it."
                             })
                             continue
                         

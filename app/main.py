@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import logging
+import os
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -69,7 +70,8 @@ async def main():
 
     except KeyboardInterrupt:
         log.info("Exiting...")
-        
+        os._exit(0)
+
     except Exception as e:
         log.error(f"An error occurred: {e}")
     
