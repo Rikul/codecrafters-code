@@ -71,9 +71,13 @@ async def main():
     except KeyboardInterrupt:
         log.info("Exiting...")
         os._exit(0)
-
+    
     except Exception as e:
         log.error(f"An error occurred: {e}")
     
 if __name__ == "__main__":
-    asyncio.run(main())
+    
+    # For better Ctrl+C handling, we use asyncio.Runner which is available in Python 3.11 and later
+    with asyncio.Runner() as runner:
+        runner.run(main())
+        
