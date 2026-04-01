@@ -5,8 +5,9 @@ import tomllib
 from pathlib import Path
 
 _config : dict = {}
+HOME_CONFIG_PATH = Path.home() / ".crafterscode" / "config.toml"
 
-def load(path: Path | str = "") -> None:
+def load(path: Path | str = HOME_CONFIG_PATH) -> None:
     global _config
 
     if not path:

@@ -10,6 +10,7 @@ load_dotenv()
 
 import app.config as config
 from app.display import log
+from app.setup import ensure_home_dir
 
 async def load_config() -> None:
     try:
@@ -22,7 +23,8 @@ async def load_config() -> None:
         return
 
 async def main():
-
+    
+    ensure_home_dir()
     await load_config()
 
     p = argparse.ArgumentParser()

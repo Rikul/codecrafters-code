@@ -85,6 +85,9 @@ class Agent:
                             "name": tool_name, 
                             "content": result
                     })
+
+                    log.info(f"{result[:200]}...")
+
             else:
                 if assistant_message.content.strip() != "":
                     print(assistant_message.content)

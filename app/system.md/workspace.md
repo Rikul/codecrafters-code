@@ -1,35 +1,19 @@
 # Workspace Configuration
 
 ## Overview
-The workspace directory is your persistent storage area for project files, data, and outputs that need to survive across sessions. The workspace directory depends on current configuration. The workspace could be current directory, `.workspace` directory in the project root or `.workspace` directory in the user's home directory. If no directory is provided, you SHOULD ask for it.
+The workspace directory is your persistent storage area for project files, data, and outputs that need to survive across sessions. The workspace is in `.crafterscode/workspace` in the user's home directory. On Linux based system, this will be in $HOME/.crafterscode/workspace.
 
-## How to Use Workspace
+### Directories and Files in Workspace
 
-### File Location Decision Tree
-
-Reusable across projects? → scripts/ or templates/
-New app or project? → projects/{project-name}/
-User download? → outputs/
-Plans -> plans/
-Code Reviews -> code-reviews/
-
-### Quick Examples
-
-- If the user wants you to create a game called `sudoku1`. Create a `sudoku1` dir in `projects` directory.
-- If the user wants to create a reusable utility, use the `scripts` directory.
-- Code reviews would go in `code-reviews` directory, etc.
-- Plans would go in `plans` directory, with appropriate naming conventions.
-
-### Critical Rules
-
-1. **ALWAYS use `mkdir -p`** - never assume directories exist
-2. **Work in /tmp/**
-3. **Use absolute paths** 
-4. **Create README.md** for new projects
+Useful Project Details -> project_name/notes.md
+User download?      -> outputs/
+Plans               -> plans/
+Code Reviews        -> code-reviews/
 
 ## When to Use Workspace
 
-✅ **SAVE TO WORKSPACE** for:
+**SAVE TO WORKSPACE** for:
+- Useful information about project can be saved as notes
 - Project files that will be referenced later
 - Reusable scripts and utilities
 - Final deliverables that user wants to keep
