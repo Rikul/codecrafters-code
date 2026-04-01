@@ -32,9 +32,11 @@ def ensure_home_dir() -> None:
                 dst.write(src.read())
             print(f"Copied config.toml to home directory: {config_path}")
         else:
-            default_config = """model = "deepseek/deepseek-v3.2\n""" \
-                             """max_iterations = 100\n""" \
-                             """max_tokens = 32768\n"""
+            default_config =    """model = "deepseek/deepseek-v3.2\n""" \
+                                """max_iterations = 100\n""" \
+                                """max_tokens = 32768\n""" \
+                                """base_url = "https://openrouter.ai/api/v1"\n"""
+            
             with open(config_path, "w", encoding="utf-8") as f:
                 f.write(default_config)
             print(f"Created default config.toml in home directory: {config_path}")
