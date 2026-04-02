@@ -1,7 +1,8 @@
 import logging
 from unittest.mock import patch, MagicMock
 
-from app.display import ask_permission, log
+from app.cli import ask_permission
+from app.display import log
 
 
 def test_log_is_configured():

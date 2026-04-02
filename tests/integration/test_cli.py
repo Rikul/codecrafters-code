@@ -46,9 +46,9 @@ async def test_cli_with_simple_prompt(capsys):
     # other tests that check the default level are not affected.
     original_log_level = app_log.level
     try:
-        with patch("sys.argv", ["prog", "-p", "say hello", "--silent"]), \
-             patch("app.agent.Client") as MockClient, \
-             patch("app.agent.load_system_context", return_value=""), \
+        with patch("sys.argv", ["prog", "cli", "-p", "say hello", "--silent"]), \
+             patch("app.cli_agent.Client") as MockClient, \
+             patch("app.helpers.load_system_context", return_value=""), \
              patch("app.main.config.load"), \
              patch.object(config_module, "_config", {"model": "test-model"}):
 

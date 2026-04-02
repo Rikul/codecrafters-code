@@ -5,16 +5,14 @@ import asyncio
 import logging
 import os
 
-
 from dotenv import load_dotenv
 load_dotenv()
-
-from app.message_queue import MessageQueue
-from app.cli import CLI
 
 import app.config as config
 from app.display import log
 from app.setup import ensure_home_dir
+from app.cli_agent import CliAgent
+from app.cli import input_loop
 
 async def load_config() -> None:
     try:
@@ -26,26 +24,29 @@ async def load_config() -> None:
         log.error(f"Failed to load configuration: {e}")
         return
 
-async def main():
-    
-    ensure_home_dir()
-    await load_config()
+def parse_args():
+    parser = argparse.ArgumentParser(prog="app")
+    subparsers = parser.add_subparsers(dest="command", required=True)
 
-    p = argparse.ArgumentParser()
+    cli_parser = subparsers.add_parser("cli", help="Run interactive CLI")
 
-    p.add_argument("-p", "--prompt", metavar="PROMPT", dest="prompt", type=str, required=True, 
+    cli_parser.add_argument("-p", "--prompt", metavar="PROMPT", dest="prompt", type=str, required=True, 
                    help="The initial prompt for the agent")
-    p.add_argument("-y", "--auto-approve", dest="auto_approve", action="store_true", 
+    cli_parser.add_argument("-y", "--auto-approve", dest="auto_approve", action="store_true", 
                    help="Allow the agent to call tools without asking for permission")
-    p.add_argument("-x", "--no-repl", dest="no_repl", action="store_true", 
+    cli_parser.add_argument("-x", "--no-repl", dest="no_repl", action="store_true", 
                    help="Run the agent with the initial prompt and then exit without starting the REPL")
-    p.add_argument("-i", "--max-iterations", metavar="N", dest="max_iterations", type=int, 
+    cli_parser.add_argument("-i", "--max-iterations", metavar="N", dest="max_iterations", type=int, 
                    help="The maximum number of iterations the agent will run before stopping (default: 100)")
-    p.add_argument("-s", "--silent", dest="silent", action="store_true",
+    cli_parser.add_argument("-s", "--silent", dest="silent", action="store_true",
                    help="Suppress all output except the final response (implies --auto-approve --no-repl)")
 
-    args = p.parse_args()
+    bg_parser = subparsers.add_parser("background", help="Run in background")
+    #bg_parser.add_argument("-c", "--channel", metavar="CHANNEL", dest="channel", type=str, required=True)
+
+    return parser.parse_args()
     
+async def run_cli(args):
     # validate max_iterations
     if args.max_iterations is None:
         args.max_iterations = config.get("max_iterations", 100)
@@ -58,31 +59,38 @@ async def main():
         log.setLevel(logging.WARNING)
 
     log.info("Starting agent...")
-
-    mq = MessageQueue()
-    loop = asyncio.get_event_loop()
-    cli = CLI(mq, loop)
-
-    from app.agent import Agent
-    agent = Agent(mq = mq, auto_approve=args.auto_approve or args.silent, 
-                  max_iterations=args.max_iterations, silent=args.silent)
+    agent = CliAgent(auto_approve=args.auto_approve or args.silent, max_iterations=args.max_iterations, silent=args.silent)
 
     await agent.agent_loop(args.prompt)
     if args.no_repl or args.silent:
         return
 
     try:
-        await asyncio.gather(
-            cli.start(),
-            mq.process_outgoing(),
-            agent.process_incoming(),
-        )
+        async for user_input in input_loop():
+            await agent.agent_loop(user_input)
     except KeyboardInterrupt:
         log.info("Exiting...")
         os._exit(0)
-    
     except Exception as e:
         log.error(f"An error occurred: {e}")
+
+async def run_background_agent(args):
+    print("Background agent not implemented yet")
+
+async def main():
+    
+    ensure_home_dir()
+    await load_config()
+
+    args = parse_args()
+
+    if args.command == "cli":
+        await run_cli(args)
+    elif args.command == "background":
+        await run_background_agent(args)
+    else:
+        raise ValueError(f"Unknown command: {args.command}")
+    
     
 if __name__ == "__main__":
     

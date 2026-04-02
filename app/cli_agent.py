@@ -8,30 +8,20 @@ from app.client import Client
 from app.tool_calls import run_tool, tool_registry
 from app.helpers import load_system_context
 from app.display import log
-from app.channel import Channel
-from app.message import OutgoingMessage, IncomingMessage
-from app.message_queue import MessageQueue
 from app.cli import ask_permission
 
-class Agent:
+class CliAgent:
 
-    def __init__(self, mq: MessageQueue = None, channel: Channel = Channel.CLI, max_iterations: int = 100, auto_approve: bool = False, silent: bool = False) -> None:
+    def __init__(self, max_iterations: int = 100, auto_approve: bool = False, silent: bool = False) -> None:
         self.client = Client().get_client()
         self.messages: list[dict] = []
-        self.auto_approve = auto_approve
+        self.auto_approve = auto_approve or silent
         self.max_iterations = max_iterations
         self.silent = silent
-        self.mq = mq
-        self.channel = channel
 
         system_context = load_system_context()
         if system_context:
             self.messages.append({"role": "system", "content": system_context})
-
-    async def process_incoming(self) -> None:
-        while True:
-            msg = await self.mq.incoming.get()
-            await self.agent_loop(msg.content)
 
     async def agent_loop(self, message: str) -> None:
         
@@ -65,10 +55,8 @@ class Agent:
             if assistant_message.tool_calls is not None:
     
                 if not self.silent and assistant_message.content is not None and assistant_message.content.strip() != "":
-                    #print(assistant_message.content.strip())
-                    if self.mq:
-                        await self.mq.outgoing_msg(OutgoingMessage(content=assistant_message.content.strip(), channel=self.channel))
-
+                    print(assistant_message.content.strip())
+                    
                 for tool_call in assistant_message.tool_calls:
 
                     try:
@@ -76,8 +64,7 @@ class Agent:
                         tool_args = json.loads(tool_call.function.arguments)
                         result = ""
 
-                        if not self.auto_approve and self.channel == Channel.CLI:
-                            #if not await ask_permission(self.mq, tool_name, tool_args):
+                        if not self.auto_approve and not ask_permission(tool_name, tool_args):
                             self.messages.append({
                                     "role": "tool",
                                     "tool_call_id": tool_call.id,
@@ -104,10 +91,8 @@ class Agent:
 
             else:
                 if assistant_message.content.strip() != "":
-                    #print(assistant_message.content)
-                    if self.mq:
-                        await self.mq.outgoing_msg(OutgoingMessage(content=assistant_message.content.strip(), channel=self.channel))
-
+                    print(assistant_message.content)
+                    
                 if finish_reason in ("stop", None):
                     break
 

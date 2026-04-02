@@ -3,7 +3,7 @@ import logging
 import pytest
 from unittest.mock import patch, MagicMock, AsyncMock, call
 
-from app.input import input_loop
+from app.cli import input_loop
 from app.main import main
 
 
@@ -70,9 +70,9 @@ def _patch_main(argv, agent_mock=None):
         agent_mock.agent_loop = AsyncMock()
 
     patches = [
-        patch("sys.argv", ["prog"] + argv),
-        patch("app.agent.Agent", return_value=agent_mock),
-        patch("app.input.input_loop", return_value=AsyncMock()),
+        patch("sys.argv", ["prog", "cli"] + argv),
+        patch("app.main.CliAgent", return_value=agent_mock),
+        patch("app.main.input_loop", return_value=AsyncMock()),
     ]
     return patches, agent_mock
 
@@ -160,7 +160,7 @@ async def test_main_silent_implies_auto_approve():
     MockAgent = MagicMock()
     MockAgent.return_value.agent_loop = AsyncMock()
 
-    with patch("sys.argv", ["prog", "-p", "hi", "--silent"]), patch("app.agent.Agent", MockAgent):
+    with patch("sys.argv", ["prog", "cli", "-p", "hi", "--silent"]), patch("app.main.CliAgent", MockAgent):
         await main()
 
     _, kwargs = MockAgent.call_args
@@ -213,9 +213,9 @@ async def test_main_repl_calls_agent_loop_for_each_input():
         for msg in ["second", "third"]:
             yield msg
 
-    with patch("sys.argv", ["prog", "-p", "first"]), \
-         patch("app.agent.Agent", return_value=agent_mock), \
-         patch("app.input.input_loop", fake_input_loop):
+    with patch("sys.argv", ["prog", "cli", "-p", "first"]), \
+         patch("app.main.CliAgent", return_value=agent_mock), \
+         patch("app.main.input_loop", fake_input_loop):
         await main()
 
     assert agent_mock.agent_loop.call_count == 3
