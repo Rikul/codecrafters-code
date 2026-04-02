@@ -67,8 +67,14 @@ async def main():
     agent = Agent(mq = mq, auto_approve=args.auto_approve or args.silent, 
                   max_iterations=args.max_iterations, silent=args.silent)
 
-    await agent.agent_loop(args.prompt)
+    # Send initial prompt to agent via message queue
+    from app.message import IncomingMessage
+    from app.channel import Channel
+    await mq.incoming_msg(IncomingMessage(content=args.prompt, channel=Channel.CLI))
+
     if args.no_repl or args.silent:
+        # For silent/no-repl mode, just run agent processing
+        await agent.process_incoming()
         return
 
     try:
@@ -89,4 +95,3 @@ if __name__ == "__main__":
     # For better Ctrl+C handling, we use asyncio.Runner which is available in Python 3.11 and later
     with asyncio.Runner() as runner:
         runner.run(main())
-        

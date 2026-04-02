@@ -77,14 +77,14 @@ class Agent:
                         result = ""
 
                         if not self.auto_approve and self.channel == Channel.CLI:
-                            #if not await ask_permission(self.mq, tool_name, tool_args):
-                            self.messages.append({
-                                    "role": "tool",
-                                    "tool_call_id": tool_call.id,
-                                    "name": tool_name,
-                                    "content": "User denied permission to run this tool. Ask for permission to run the tool again if you want to try running it."
-                                })
-                            continue
+                            if not await ask_permission(self.mq, tool_name, tool_args):
+                                self.messages.append({
+                                        "role": "tool",
+                                        "tool_call_id": tool_call.id,
+                                        "name": tool_name,
+                                        "content": "User denied permission to run this tool. Ask for permission to run the tool again if you want to try running it."
+                                    })
+                                continue
                         
                         result = run_tool(tool_name=tool_name, tool_args=tool_args)
  
@@ -110,4 +110,3 @@ class Agent:
 
                 if finish_reason in ("stop", None):
                     break
-

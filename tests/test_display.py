@@ -1,7 +1,7 @@
 import logging
 from unittest.mock import patch, MagicMock
 
-from app.display import ask_permission, log
+from app.display import log
 
 
 def test_log_is_configured():
@@ -21,32 +21,6 @@ def test_library_loggers_silenced():
         assert logging.getLogger(name).level == logging.WARNING
 
 
-def test_ask_permission_returns_true_when_confirmed():
-    """Test ask_permission returns True when user confirms"""
-    with patch("builtins.input", return_value="y"):
-        result = ask_permission("bash", {"command": "echo hi"})
-    assert result is True
-
-
-def test_ask_permission_returns_true_when_empty_input():
-    """Test ask_permission returns True when user presses Enter"""
-    with patch("builtins.input", return_value=""):
-        result = ask_permission("bash", {"command": "echo hi"})
-    assert result is True
-
-
-def test_ask_permission_returns_false_when_denied():
-    """Test ask_permission returns False when user denies"""
-    with patch("builtins.input", return_value="n"):
-        result = ask_permission("read_file", {"file_path": "/tmp/x"})
-    assert result is False
-
-
-def test_ask_permission_prints_tool_name_and_args(capsys):
-    """Test ask_permission prints tool name and args"""
-    with patch("builtins.input", return_value="y"):
-        ask_permission("write_file", {"file_path": "/tmp/out.txt", "content": "hello"})
-    
-    captured = capsys.readouterr()
-    assert "write_file" in captured.out
-    assert "/tmp/out.txt" in captured.out
+# Note: ask_permission tests have been removed because the function
+# has been moved to app.cli and completely rewritten with a different
+# async interface that uses message queues.
