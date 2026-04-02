@@ -5,8 +5,12 @@ import asyncio
 import logging
 import os
 
+
 from dotenv import load_dotenv
 load_dotenv()
+
+from app.message_queue import MessageQueue
+from app.cli import CLI
 
 import app.config as config
 from app.display import log
@@ -55,21 +59,24 @@ async def main():
 
     log.info("Starting agent...")
 
+    mq = MessageQueue()
+    loop = asyncio.get_event_loop()
+    cli = CLI(mq, loop)
+
     from app.agent import Agent
-    agent = Agent(auto_approve=args.auto_approve or args.silent, 
+    agent = Agent(mq = mq, auto_approve=args.auto_approve or args.silent, 
                   max_iterations=args.max_iterations, silent=args.silent)
 
     await agent.agent_loop(args.prompt)
     if args.no_repl or args.silent:
         return
 
-    from app.input import input_loop
-
     try:
-
-        async for user_input in input_loop():
-            await agent.agent_loop(user_input)
-
+        await asyncio.gather(
+            cli.start(),
+            mq.process_outgoing(),
+            agent.process_incoming(),
+        )
     except KeyboardInterrupt:
         log.info("Exiting...")
         os._exit(0)

@@ -36,8 +36,3 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 logging.getLogger("httpcore").setLevel(logging.WARNING)
 logging.getLogger("openai").setLevel(logging.WARNING)
 logging.getLogger("urllib3").setLevel(logging.WARNING)
-
-def ask_permission(tool_name: str, args: dict) -> bool:
-    print(f"{YELLOW}⚡ Tool Call{RESET}: {CYAN}{tool_name}{RESET}   Args: {args}")
-    answer = input(f"Proceed? {DIM}[Y/n]{RESET} ").strip().lower()
-    return answer in ("", "y", "yes")
