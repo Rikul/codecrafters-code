@@ -24,6 +24,8 @@ The implementation uses the OpenRouter API (defaulting to DeepSeek) via the Open
 - **Skills System**: Skills located in `app/skills/` directory (e.g., `puppeteer`)
 - **System Context Loading**: Loads personality and instructions from `app/system.md/` on startup
 - **Background Agent**: Message queue and channel architecture for multi-channel delivery (Telegram, Discord, Web, etc.)
+- **Telegram Integration**: Built-in Telegram bot channel (`app/telegram_channel.py`) for receiving and sending messages
+- **Web Server**: HTTP server (`app/server.py`) for web-based channel delivery
 
 ## Prerequisites
 
@@ -116,13 +118,15 @@ Tools are registered in `app/tool_calls.py` (`tool_registry` dict: name → `{sp
 ├── app/
 │   ├── tools/              # Tool implementations
 │   ├── skills/             # Skill definitions (e.g., puppeteer/)
-│   ├── system.md/          # System context markdown files
+│   ├── system.md           # System context markdown (loaded on startup)
 │   ├── cli_agent.py        # Interactive CLI agent
 │   ├── background_agent.py # Background agent with message queue
 │   ├── cli.py              # REPL input loop
 │   ├── channel.py          # Channel enum
 │   ├── message.py          # Message dataclasses
 │   ├── message_queue.py    # Async message queue
+│   ├── telegram_channel.py # Telegram bot delivery channel
+│   ├── server.py           # HTTP server for web channel
 │   ├── tool_calls.py       # Tool registry and dispatcher
 │   ├── helpers.py          # System context loader
 │   ├── display.py          # Logging/display utilities
