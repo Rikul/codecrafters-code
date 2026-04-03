@@ -46,7 +46,7 @@ base_url = "https://openrouter.ai/api/v1"
 
 [telegram]
 BOT_TOKEN = ""
-ALLOW_FROM = []  # List of allowed Telegram user IDs (integers). Empty list means allow all.
+ALLOW_FROM = []  # List of allowed Telegram user IDs (integers).
 ```
 
 ## Usage
