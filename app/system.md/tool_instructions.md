@@ -33,6 +33,7 @@ Guidelines for when and how to use available tools effectively.
 ### How to Use Todo Tools Effectively
 
 1. **Plan First**: 
+   - Use todos for complex tasks involving more than 3 steps
    - Use `todo_add` at the beginning of complex work
    - Break large tasks into 3-7 manageable subtasks
    - Add optional descriptions for clarity
@@ -52,27 +53,12 @@ Guidelines for when and how to use available tools effectively.
 todo_add "Set up project structure", "Create directories and basic files"
 todo_add "Implement core functionality", "Write main algorithm"
 todo_add "Add tests", "Create unit tests for the new feature"
-todo_add "Update documentation", "Update README and inline docs"
-
-# Work on tasks, updating as you go
-todo_update "1" "in_progress"
-# ... do the work ...
-todo_update "1" "done"
-todo_update "2" "in_progress"
-# ... etc.
-
-# Check progress
-todo_list()
-
-# When all done
-todo_clear()
 ```
 
 ## Quality Checks
 - Validate tool outputs before using them
 - Verify file creation succeeded
 - Check command exit codes
-- Confirm URLs are accessible before fetching
 
 ## Error Recovery
 1. Identify the failure point

@@ -1,12 +1,6 @@
-## User Profile
-- **Location**: Somewhere in United States
-- **Language Preference**: English (default)
-
 ## Communication
 - **Verbosity**: detailed
 - **Technical Level**: advanced
-- **Code Comments**: standard
-- **Explanations**: show work
 
 ## Formatting
 - **Code Style**: 
@@ -21,11 +15,9 @@
 - **Testing**: Provide unit tests when requested
 - **Logging**: Include appropriate logging statements
 - **Show Examples**: Yes - provide concrete examples
-- **Best Practices**: Yes - suggest improvements and alternatives
 
 ## Notes
 - Optimize for readability over cleverness.
 - User prefers clear explanations before diving into code
 - Appreciates efficiency but not at the cost of readability
-- Open to learning new approaches and technologies
 - Call out security/performance concerns only when they are specific and actionable.

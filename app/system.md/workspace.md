@@ -1,7 +1,7 @@
 # Workspace Configuration
 
 ## Overview
-The workspace directory is your persistent storage area for project files, data, and outputs that need to survive across sessions. The workspace is in `.crafterscode/workspace` in the user's home directory. On Linux based system, this will be in $HOME/.crafterscode/workspace.
+The workspace directory is your persistent storage area for project files, data, and outputs that need to survive across sessions. The workspace is in the `.crafterscode/workspace` directory in the user's home. On Linux based system, this will be in $HOME/.crafterscode/workspace.
 
 ### Directories and Files in Workspace
 
