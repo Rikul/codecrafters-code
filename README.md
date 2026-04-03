@@ -2,30 +2,14 @@ A CodeCrafters challenge project implementing an AI agent with tool calling capa
 
 ## Overview
 
-- Parse and execute user prompts
-- Make decisions about which tools to use
-- Interact with the file system (read, write)
-- Execute shell commands
-- Fetch web content
-- Track tasks with todo system
-
-The implementation uses the OpenRouter API (defaulting to DeepSeek) via the OpenAI Python client and follows the CodeCrafters challenge requirements.
-
-## Features
+An AI agent that can parse and execute user prompts, interact with the file system, run shell commands, fetch web content, and track tasks. Built using the OpenRouter API (defaulting to DeepSeek) via the OpenAI Python client.
 
 - **Interactive CLI**: REPL mode for multi-turn agent sessions
-- **Tool Calling**: Multiple tools for file operations, web fetching, and shell commands
-  - `read_file`: Read contents of files
-  - `write_file`: Write content to files (with safety checks)
-  - `bash`: Execute shell commands
-  - `web_fetch`: Retrieve content from URLs
-  - `get_skills_dir`: Locate skills directory
-  - **Todo Tools**: `todo_add`, `todo_list`, `todo_update`, `todo_clear` for task tracking
+- **Tool Calling**: File operations, shell commands, web fetching, and task tracking
 - **Skills System**: Skills located in `app/skills/` directory (e.g., `puppeteer`)
-- **System Context Loading**: Loads personality and instructions from `app/system.md/` on startup
-- **Background Agent**: Message queue and channel architecture for multi-channel delivery (Telegram, Discord, Web, etc.)
+- **Background Agent**: Message queue and channel architecture for multi-channel delivery (Telegram, Discord, etc.)
 - **Telegram Integration**: Built-in Telegram bot channel (`app/telegram_channel.py`) for receiving and sending messages
-- **Web Server**: HTTP server (`app/server.py`) for web-based channel delivery
+- **Background Server**: Server (`app/server.py`) for web-based channel delivery
 
 ## Prerequisites
 
