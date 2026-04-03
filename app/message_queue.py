@@ -20,9 +20,11 @@ class MessageQueue:
         self._delivery[channel] = fn
 
     async def incoming_msg(self, message: IncomingMessage):
+        log.info(f"Received incoming message for channel {message.channel}: {message.content}")
         await self.incoming.put(message)
 
     async def outgoing_msg(self, message: OutgoingMessage):
+        log.info(f"Queueing outgoing message for channel {message.channel}: {message.content}")
         await self.outgoing.put(message)
 
     async def process_outgoing(self):

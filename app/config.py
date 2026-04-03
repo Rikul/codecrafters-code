@@ -7,11 +7,9 @@ from pathlib import Path
 _config : dict = {}
 HOME_CONFIG_PATH = Path.home() / ".crafterscode" / "config.toml"
 
+
 def load(path: Path | str = HOME_CONFIG_PATH) -> None:
     global _config
-
-    if not path:
-        path = Path(__file__).parent / "config.toml"
 
     if not os.path.exists(path):
         raise RuntimeError(f"Config file {path} does not exist")
@@ -26,3 +24,20 @@ def __getattr__(name: str):
     if name in _config:
         return _config[name]
     raise AttributeError(f"Config has no attribute {name}")
+
+
+def get_default_config() -> dict:
+
+    default_config =    """\
+model = "deepseek/deepseek-v3.2
+max_iterations = 100
+max_tokens = 32768
+base_url = "https://openrouter.ai/api/v1
+
+[telegram]
+BOT_TOKEN = ""
+ALLOW_FROM = []  # List of allowed Telegram user IDs (integers). Empty list means allow all.
+"""
+
+    return default_config
+            

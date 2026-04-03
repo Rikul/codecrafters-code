@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
+from .config import get_default_config
 
 APP_NAME = "crafterscode"
 
@@ -26,17 +27,7 @@ def ensure_home_dir() -> None:
     # Copy config.toml from current directory to home directory if it doesn't exist
     config_path = home_dir / "config.toml"
     if not config_path.exists():
-        current_config_path = Path(__file__).parent / "config.toml"
-        if current_config_path.exists():
-            with open(current_config_path, "r", encoding="utf-8") as src, open(config_path, "w", encoding="utf-8") as dst:
-                dst.write(src.read())
-            print(f"Copied config.toml to home directory: {config_path}")
-        else:
-            default_config =    """model = "deepseek/deepseek-v3.2\n""" \
-                                """max_iterations = 100\n""" \
-                                """max_tokens = 32768\n""" \
-                                """base_url = "https://openrouter.ai/api/v1"\n"""
-            
-            with open(config_path, "w", encoding="utf-8") as f:
-                f.write(default_config)
-            print(f"Created default config.toml in home directory: {config_path}")
+        default_config = get_default_config()
+        with open(config_path, "w", encoding="utf-8") as f:
+            f.write(default_config)
+        print(f"Created default config.toml in home directory: {config_path}")

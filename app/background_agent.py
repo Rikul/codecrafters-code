@@ -29,12 +29,13 @@ class BackgroundAgent:
             self.messages.append({"role": "system", "content": system_context})
 
     async def process_incoming(self) -> None:
+        log.info("BackgroundAgent started processing incoming messages...")
         while True:
             msg = await self.mq.incoming.get()
-            await self.agent_loop(msg.content)
+            await self.agent_loop(msg.content, msg.metadata)
 
-    async def agent_loop(self, message: str) -> None:
-        
+    async def agent_loop(self, message: str, metadata: dict = None) -> None:
+        self._reply_metadata = metadata or {}
         self.messages.append({"role": "user", "content": message})
         tool_specs = [tool["spec"] for tool in tool_registry.values()]
 
@@ -66,7 +67,7 @@ class BackgroundAgent:
     
                 if assistant_message.content is not None and assistant_message.content.strip() != "":
                     if self.mq:
-                        await self.mq.outgoing_msg(OutgoingMessage(content=assistant_message.content.strip(), channel=self.channel))
+                        await self.mq.outgoing_msg(OutgoingMessage(content=assistant_message.content.strip(), channel=self.channel, metadata=self._reply_metadata))
 
                 for tool_call in assistant_message.tool_calls:
 
@@ -92,7 +93,7 @@ class BackgroundAgent:
             else:
                 if assistant_message.content.strip() != "":
                     if self.mq:
-                        await self.mq.outgoing_msg(OutgoingMessage(content=assistant_message.content.strip(), channel=self.channel))
+                        await self.mq.outgoing_msg(OutgoingMessage(content=assistant_message.content.strip(), channel=self.channel, metadata=self._reply_metadata))
 
                 if finish_reason in ("stop", None):
                     break

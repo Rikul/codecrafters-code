@@ -8,11 +8,12 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-import app.config as config
-from app.display import log
-from app.setup import ensure_home_dir
-from app.cli_agent import CliAgent
-from app.cli import input_loop
+from . import config
+from .display import log
+from .setup import ensure_home_dir
+from .cli import input_loop
+from .cli_agent import CliAgent
+from .server import start_server
 
 async def load_config() -> None:
     try:
@@ -47,6 +48,7 @@ def parse_args():
     return parser.parse_args()
     
 async def run_cli(args):
+
     # validate max_iterations
     if args.max_iterations is None:
         args.max_iterations = config.get("max_iterations", 100)
@@ -74,8 +76,12 @@ async def run_cli(args):
     except Exception as e:
         log.error(f"An error occurred: {e}")
 
+
 async def run_background_agent(args):
-    print("Background agent not implemented yet")
+
+    from .server import start_server
+    await start_server()
+
 
 async def main():
     
