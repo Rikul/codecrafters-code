@@ -48,7 +48,7 @@ class TelegramChannel:
 
     async def process_message(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         user_id = update.effective_user.id if update.effective_user else None
-        if self.allow_from and user_id not in self.allow_from:
+        if self.allow_from and (user_id is None or user_id not in self.allow_from):
             log.warning(f"Received message from unauthorized user id={user_id}, ignoring.")
             await update.message.reply_text("Sorry, you are not authorized to use this bot.")
             return

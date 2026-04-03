@@ -2,30 +2,14 @@ A CodeCrafters challenge project implementing an AI agent with tool calling capa
 
 ## Overview
 
-- Parse and execute user prompts
-- Make decisions about which tools to use
-- Interact with the file system (read, write)
-- Execute shell commands
-- Fetch web content
-- Track tasks with todo system
-
-The implementation uses the OpenRouter API (defaulting to DeepSeek) via the OpenAI Python client and follows the CodeCrafters challenge requirements.
-
-## Features
+An AI agent that can parse and execute user prompts, interact with the file system, run shell commands, fetch web content, and track tasks. Built using the OpenRouter API (defaulting to DeepSeek) via the OpenAI Python client.
 
 - **Interactive CLI**: REPL mode for multi-turn agent sessions
-- **Tool Calling**: Multiple tools for file operations, web fetching, and shell commands
-  - `read_file`: Read contents of files
-  - `write_file`: Write content to files (with safety checks)
-  - `bash`: Execute shell commands
-  - `web_fetch`: Retrieve content from URLs
-  - `get_skills_dir`: Locate skills directory
-  - **Todo Tools**: `todo_add`, `todo_list`, `todo_update`, `todo_clear` for task tracking
+- **Tool Calling**: File operations, shell commands, web fetching, and task tracking
 - **Skills System**: Skills located in `app/skills/` directory (e.g., `puppeteer`)
-- **System Context Loading**: Loads personality and instructions from `app/system.md/` on startup
-- **Background Agent**: Message queue and channel architecture for multi-channel delivery (Telegram, Discord, Web, etc.)
+- **Background Agent**: Message queue and channel architecture for multi-channel delivery (Telegram, Discord, etc.)
 - **Telegram Integration**: Built-in Telegram bot channel (`app/telegram_channel.py`) for receiving and sending messages
-- **Web Server**: HTTP server (`app/server.py`) for web-based channel delivery
+
 
 ## Prerequisites
 
@@ -59,6 +43,10 @@ model = "deepseek/deepseek-v3.2"
 max_iterations = 100
 max_tokens = 32768
 base_url = "https://openrouter.ai/api/v1"
+
+[telegram]
+BOT_TOKEN = ""
+ALLOW_FROM = []  # List of allowed Telegram user IDs (integers).
 ```
 
 ## Usage
@@ -87,59 +75,23 @@ base_url = "https://openrouter.ai/api/v1"
 ./run.sh cli -p "Summarize this repo" -s
 ```
 
-## Architecture
+### Background Agent with Telegram
 
-### Agent Loop
+To run the agent as a Telegram bot, set your `BOT_TOKEN` and optionally restrict access by Telegram user ID in `~/.crafterscode/config.toml`:
 
-`CliAgent` (`app/cli_agent.py`) and `BackgroundAgent` (`app/background_agent.py`) share the same loop:
-1. Append user message to `self.messages`
-2. Call `chat.completions.create` with tool specs
-3. If `tool_calls`: optionally ask permission, run each via `run_tool()`, append results, loop
-4. If no tool calls: print/send content, break on `finish_reason == "stop"`
-
-`CliAgent` prints to stdout and prompts stdin for permission. `BackgroundAgent` routes messages through `MessageQueue` + `Channel` for multi-channel delivery.
-
-### Tool System
-
-Tools are registered in `app/tool_calls.py` (`tool_registry` dict: name → `{spec, func}`). Each tool in `app/tools/` exports a function and an OpenAI-format spec. `run_tool()` dispatches by name and restores `os.getcwd()` after each call.
-
-### System Context
-
-`load_system_context()` (`app/helpers.py`) loads markdown files from `app/system.md/` in order: `self.md`, `user.md`, `workspace.md`, `tool_instructions.md`, `skills.md`. Combined content becomes the system message.
-
-### Message Queue / Channel Architecture
-
-`MessageQueue` (`app/message_queue.py`) holds two `asyncio.Queue`s (incoming/outgoing). Delivery functions are registered per `Channel` enum value. This is the extension point for adding new delivery channels.
-
-## Project Structure
-
+```toml
+[telegram]
+BOT_TOKEN = "123456:ABC-your-bot-token"
+ALLOW_FROM = [123456789]  # Telegram user IDs allowed to interact.
 ```
-.
-├── app/
-│   ├── tools/              # Tool implementations
-│   ├── skills/             # Skill definitions (e.g., puppeteer/)
-│   ├── system.md           # System context markdown (loaded on startup)
-│   ├── cli_agent.py        # Interactive CLI agent
-│   ├── background_agent.py # Background agent with message queue
-│   ├── cli.py              # REPL input loop
-│   ├── channel.py          # Channel enum
-│   ├── message.py          # Message dataclasses
-│   ├── message_queue.py    # Async message queue
-│   ├── telegram_channel.py # Telegram bot delivery channel
-│   ├── server.py           # HTTP server for web channel
-│   ├── tool_calls.py       # Tool registry and dispatcher
-│   ├── helpers.py          # System context loader
-│   ├── display.py          # Logging/display utilities
-│   ├── config.py           # Config loader
-│   ├── setup.py            # Home directory setup
-│   ├── client.py           # OpenAI client factory
-│   └── main.py             # Entry point (argparse, subcommands)
-├── tests/
-│   └── integration/        # Full-pipeline integration tests
-├── pyproject.toml
-├── run.sh
-└── README.md
+
+Then start the background agent:
+
+```bash
+./run.sh background
 ```
+
+The agent will listen for messages on Telegram and respond via the bot. Responses are routed back to the same chat that sent the message.
 
 ## Testing
 
