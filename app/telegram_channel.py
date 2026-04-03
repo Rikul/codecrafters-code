@@ -10,6 +10,8 @@ from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, Messa
 
 log = logging.getLogger(__name__)
 
+MAX_TG_LENGTH = 2048
+
 async def hello(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(f'Hello {update.effective_user.first_name}')
 
@@ -42,7 +44,7 @@ class TelegramChannel:
             log.error("Cannot send Telegram message: no chat_id in message metadata")
             return
         log.info(f"Sending message to Telegram chat {chat_id}: {message.content}")
-        await self.app.bot.send_message(chat_id=chat_id, text=message.content)
+        await self.app.bot.send_message(chat_id=chat_id, text=self.trim_message(message.content))
 
     async def process_message(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         user_id = update.effective_user.id if update.effective_user else None
@@ -78,3 +80,8 @@ class TelegramChannel:
             await self.app.updater.stop()
             await self.app.stop()
             await self.app.shutdown()
+
+    def trim_message(self, content: str) -> str:
+        if len(content) > MAX_TG_LENGTH:
+            return content[:MAX_TG_LENGTH-3] + "..."
+        return content
