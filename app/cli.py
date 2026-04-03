@@ -1,6 +1,3 @@
-from app.channel import Channel
-from app.message_queue import MessageQueue
-from app.message import IncomingMessage, OutgoingMessage
 import app.display as display
 import asyncio
 

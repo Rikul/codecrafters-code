@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 from pathlib import Path
 from .config import get_default_config
 
@@ -8,7 +7,6 @@ APP_NAME = "crafterscode"
 
 def ensure_home_dir() -> None:
     import os
-    from pathlib import Path
 
     # Create app home directory in user's home if it doesn't exist
     home_dir = Path.home() / f".{APP_NAME}"

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import asyncio
 
 import app.config as config
 from app.client import Client
@@ -9,7 +8,7 @@ from app.tool_calls import run_tool, tool_registry
 from app.helpers import load_system_context
 from app.display import log
 from app.channel import Channel
-from app.message import OutgoingMessage, IncomingMessage
+from app.message import OutgoingMessage
 from app.message_queue import MessageQueue
 
 class BackgroundAgent:

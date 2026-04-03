@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import asyncio
 
 import app.config as config
 from app.client import Client
@@ -90,7 +89,7 @@ class CliAgent:
                     log.info(f"{result[:200]}...")
 
             else:
-                if assistant_message.content.strip() != "":
+                if assistant_message.content is not None and assistant_message.content.strip() != "":
                     print(assistant_message.content)
                     
                 if finish_reason in ("stop", None):

@@ -1,11 +1,9 @@
 import asyncio
-import json
 import logging
 
 from .message_queue import MessageQueue
 from .channel import Channel
 from .message import OutgoingMessage, IncomingMessage
-from .channel import Channel
 
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, MessageHandler, filters

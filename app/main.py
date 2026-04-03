@@ -5,8 +5,6 @@ import asyncio
 import logging
 import os
 
-from dotenv import load_dotenv
-load_dotenv()
 
 from . import config
 from .display import log
@@ -14,6 +12,9 @@ from .setup import ensure_home_dir
 from .cli import input_loop
 from .cli_agent import CliAgent
 from .server import start_server
+
+from dotenv import load_dotenv
+load_dotenv()
 
 async def load_config() -> None:
     try:
@@ -42,8 +43,7 @@ def parse_args():
     cli_parser.add_argument("-s", "--silent", dest="silent", action="store_true",
                    help="Suppress all output except the final response (implies --auto-approve --no-repl)")
 
-    bg_parser = subparsers.add_parser("background", help="Run in background")
-    #bg_parser.add_argument("-c", "--channel", metavar="CHANNEL", dest="channel", type=str, required=True)
+    subparsers.add_parser("background", help="Run in background")
 
     return parser.parse_args()
     
@@ -79,7 +79,6 @@ async def run_cli(args):
 
 async def run_background_agent(args):
 
-    from .server import start_server
     await start_server()
 
 
@@ -101,6 +100,13 @@ async def main():
 if __name__ == "__main__":
     
     # For better Ctrl+C handling, we use asyncio.Runner which is available in Python 3.11 and later
-    with asyncio.Runner() as runner:
-        runner.run(main())
-        
+    try:
+        with asyncio.Runner() as runner:
+            runner.run(main())
+    except KeyboardInterrupt:
+        log.info("Exiting...")
+        os._exit(0)
+    except Exception as e:
+        log.error(f"An error occurred: {e}")
+        os._exit(1)
+

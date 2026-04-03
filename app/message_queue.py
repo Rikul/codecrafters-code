@@ -1,5 +1,4 @@
 import asyncio
-from dataclasses import dataclass, field
 from typing import Callable, Awaitable
 from app.channel import Channel
 from app.message import IncomingMessage, OutgoingMessage
