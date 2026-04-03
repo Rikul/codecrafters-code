@@ -98,7 +98,7 @@ To run the agent as a Telegram bot, set your `BOT_TOKEN` and optionally restrict
 ```toml
 [telegram]
 BOT_TOKEN = "123456:ABC-your-bot-token"
-ALLOW_FROM = [123456789]  # Telegram user IDs allowed to interact. Empty = allow all.
+ALLOW_FROM = [123456789]  # Telegram user IDs allowed to interact.
 ```
 
 Then start the background agent:
