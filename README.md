@@ -9,7 +9,7 @@ An AI agent that can parse and execute user prompts, interact with the file syst
 - **Skills System**: Skills located in `app/skills/` directory (e.g., `puppeteer`)
 - **Background Agent**: Message queue and channel architecture for multi-channel delivery (Telegram, Discord, etc.)
 - **Telegram Integration**: Built-in Telegram bot channel (`app/telegram_channel.py`) for receiving and sending messages
-- **Background Server**: Server (`app/server.py`) for web-based channel delivery
+
 
 ## Prerequisites
 
