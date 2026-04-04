@@ -1,4 +1,4 @@
-from app.display import log
+from ..display import log
 import pathlib
 
 

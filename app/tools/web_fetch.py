@@ -1,5 +1,5 @@
 import subprocess
-from app.display import log
+from ..display import log
 
 web_fetch_tool_spec = {
   "type": "function",

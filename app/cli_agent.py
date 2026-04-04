@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import json
 
-import app.config as config
-from app.client import Client
-from app.tool_calls import run_tool, tool_registry
-from app.helpers import load_system_context
-from app.display import log
-from app.cli import ask_permission
+from . import config
+from .client import Client
+from .tool_calls import run_tool, tool_registry
+from .helpers import load_system_context
+from .display import log
+from .cli import ask_permission
 
 class CliAgent:
 

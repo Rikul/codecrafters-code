@@ -1,5 +1,5 @@
 import os
-from app.display import log
+from ..display import log
 
 read_file_tool_spec = {
   "type": "function",

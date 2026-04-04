@@ -11,7 +11,7 @@ from .display import log
 from .setup import ensure_home_dir
 from .cli import input_loop
 from .cli_agent import CliAgent
-from .server import start_server
+from .bg_server import start_server
 
 from dotenv import load_dotenv
 load_dotenv()

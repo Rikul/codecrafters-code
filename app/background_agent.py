@@ -2,14 +2,14 @@ from __future__ import annotations
 
 import json
 
-import app.config as config
-from app.client import Client
-from app.tool_calls import run_tool, tool_registry
-from app.helpers import load_system_context
-from app.display import log
-from app.channel import Channel
-from app.message import OutgoingMessage
-from app.message_queue import MessageQueue
+from . import config
+from .client import Client
+from .tool_calls import run_tool, tool_registry
+from .helpers import load_system_context
+from .display import log
+from .channel import Channel
+from .message import OutgoingMessage
+from .message_queue import MessageQueue
 
 class BackgroundAgent:
 

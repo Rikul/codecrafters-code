@@ -27,3 +27,10 @@ def load_system_context() -> str:
     log.info(f"Loaded system context: {len(system_context)} characters")
 
     return system_context
+
+
+
+def trunc_str_with_ellipsis(max_length : int, content: str) -> str:
+    if len(content) > max_length:
+        return content[:max_length-3] + "..."
+    return content

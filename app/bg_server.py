@@ -1,14 +1,23 @@
 import asyncio
+import os
+
 from . import config
 from .display import log
 from .background_agent import BackgroundAgent
 from .message_queue import MessageQueue
+
 
 async def start_server() -> None:
 
     log.info("Starting server...")
     telegram_channel = None
     mq = MessageQueue()
+
+    # Change CWD to PROJECT_HOME/workspace to ensure all file operations are relative to this directory
+    # This is important for the agent to read/write files in the workspace
+    workspace_dir = config.PROJECT_HOME / "workspace"
+    workspace_dir.mkdir(parents=True, exist_ok=True)
+    os.chdir(workspace_dir)
 
     if config.get("telegram"):
         bot_token = config.telegram.get("BOT_TOKEN")

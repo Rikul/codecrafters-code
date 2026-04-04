@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from openai import AsyncOpenAI
 import os
-import app.config as config
+from . import config
 
 class Client:
 

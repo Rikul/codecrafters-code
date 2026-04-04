@@ -29,7 +29,9 @@ def make_agent(auto_approve=True, silent=True, max_iterations=10):
         mock_openai = make_mock_client()
         MockClient.return_value.get_client.return_value = mock_openai
         with patch("app.cli_agent.load_system_context", return_value=""):
-            agent = Agent(auto_approve=auto_approve, silent=silent, max_iterations=max_iterations)
+            agent = Agent(
+                auto_approve=auto_approve, silent=silent, max_iterations=max_iterations
+            )
     # Attach the mock client so callers can reconfigure it after construction
     agent.client = mock_openai
     return agent, mock_openai
@@ -61,7 +63,10 @@ def test_agent_initializes_with_system_context():
 async def test_agent_loop_adds_user_message():
     agent, mock_client = make_agent()
     await agent.agent_loop("What is 2+2?")
-    assert any(m.get("role") == "user" and m.get("content") == "What is 2+2?" for m in agent.messages)
+    assert any(
+        m.get("role") == "user" and m.get("content") == "What is 2+2?"
+        for m in agent.messages
+    )
 
 
 @pytest.mark.asyncio
@@ -69,7 +74,9 @@ async def test_agent_loop_appends_assistant_message():
     agent, mock_client = make_agent()
     await agent.agent_loop("Hello")
     assistant_messages = [m for m in agent.messages if not isinstance(m, dict)]
-    assert any(msg.content == "Hello!" and msg.tool_calls is None for msg in assistant_messages)
+    assert any(
+        msg.content == "Hello!" and msg.tool_calls is None for msg in assistant_messages
+    )
 
 
 @pytest.mark.asyncio
@@ -150,12 +157,16 @@ async def test_agent_loop_runs_tool_when_auto_approve():
     response_plain = MagicMock()
     response_plain.choices = [choice_plain]
 
-    mock_client.chat.completions.create = AsyncMock(side_effect=[response_with_tool, response_plain])
+    mock_client.chat.completions.create = AsyncMock(
+        side_effect=[response_with_tool, response_plain]
+    )
 
     with patch("app.cli_agent.run_tool", return_value="hi\n") as mock_run_tool:
         await agent.agent_loop("say hi")
 
-    mock_run_tool.assert_called_once_with(tool_name="bash", tool_args={"command": "echo hi"})
+    mock_run_tool.assert_called_once_with(
+        tool_name="bash", tool_args={"command": "echo hi"}
+    )
 
 
 @pytest.mark.asyncio
@@ -185,7 +196,9 @@ async def test_agent_loop_continues_when_finish_reason_not_stop():
     response_final = MagicMock()
     response_final.choices = [choice_final]
 
-    mock_client.chat.completions.create = AsyncMock(side_effect=[response_partial, response_final])
+    mock_client.chat.completions.create = AsyncMock(
+        side_effect=[response_partial, response_final]
+    )
 
     await agent.agent_loop("continue")
 

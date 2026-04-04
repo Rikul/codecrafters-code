@@ -4,26 +4,38 @@ import logging
 from .message_queue import MessageQueue
 from .channel import Channel
 from .message import OutgoingMessage, IncomingMessage
+from .helpers import trunc_str_with_ellipsis
 
 from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, MessageHandler, filters
+from telegram.ext import (
+    ApplicationBuilder,
+    CommandHandler,
+    ContextTypes,
+    MessageHandler,
+    filters,
+)
 
 log = logging.getLogger(__name__)
 
 MAX_TG_LENGTH = 2048
 
+
 async def hello(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text(f'Hello {update.effective_user.first_name}')
+    await update.message.reply_text(f"Hello {update.effective_user.first_name}")
+
 
 class TelegramChannel:
-
-    def __init__(self, mq: MessageQueue, bot_token: str, allow_from: list[str] = None) -> None:
+    def __init__(
+        self, mq: MessageQueue, bot_token: str, allow_from: list[str] = None
+    ) -> None:
         self.bot_token = bot_token
         self.allow_from = allow_from or []
         self.mq = mq
         mq.register(self, self.send_message)
 
-    async def error_handler(self, update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
+    async def error_handler(
+        self, update: object, context: ContextTypes.DEFAULT_TYPE
+    ) -> None:
         log.error("Telegram error:", exc_info=context.error)
 
         # optionally notify user if update was from a chat
@@ -44,30 +56,47 @@ class TelegramChannel:
             log.error("Cannot send Telegram message: no chat_id in message metadata")
             return
         log.info(f"Sending message to Telegram chat {chat_id}: {message.content}")
-        await self.app.bot.send_message(chat_id=chat_id, text=self.trim_message(message.content))
+        await self.app.bot.send_message(
+            chat_id=chat_id,
+            text=trunc_str_with_ellipsis(MAX_TG_LENGTH, message.content),
+        )
 
-    async def process_message(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    async def process_message(
+        self, update: Update, context: ContextTypes.DEFAULT_TYPE
+    ) -> None:
         user_id = update.effective_user.id if update.effective_user else None
-        if user_id is None or user_id not in self.allow_from:
-            log.warning(f"Received message from unauthorized user id={user_id}, ignoring.")
-            await update.message.reply_text("Sorry, you are not authorized to use this bot.")
+        if user_id is None or (self.allow_from and user_id not in self.allow_from):
+            log.warning(
+                f"Received message from unauthorized user id={user_id}, ignoring."
+            )
+            await update.message.reply_text(
+                "Sorry, you are not authorized to use this bot."
+            )
             return
 
         if update.message and update.message.text:
             content = update.message.text.strip()
             if content != "":
-                await self.mq.incoming.put(IncomingMessage(content=content, channel=Channel.TELEGRAM, metadata={"chat_id": update.effective_chat.id}))
+                await self.mq.incoming.put(
+                    IncomingMessage(
+                        content=content,
+                        channel=Channel.TELEGRAM,
+                        metadata={"chat_id": update.effective_chat.id},
+                    )
+                )
             else:
                 await update.message.reply_text("Please send a non-empty message.")
         else:
             await update.message.reply_text("Sorry, I can only process text messages.")
 
     def start(self) -> None:
-        print("Starting Telegram channel...")
+        log.info("Starting Telegram channel...")
 
         self.app = ApplicationBuilder().token(self.bot_token).build()
         self.app.add_handler(CommandHandler("hello", hello))
-        self.app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, self.process_message))
+        self.app.add_handler(
+            MessageHandler(filters.TEXT & ~filters.COMMAND, self.process_message)
+        )
         self.app.add_error_handler(self.error_handler)
 
     async def run_polling(self) -> None:
@@ -80,8 +109,3 @@ class TelegramChannel:
             await self.app.updater.stop()
             await self.app.stop()
             await self.app.shutdown()
-
-    def trim_message(self, content: str) -> str:
-        if len(content) > MAX_TG_LENGTH:
-            return content[:MAX_TG_LENGTH-3] + "..."
-        return content

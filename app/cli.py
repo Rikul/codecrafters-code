@@ -1,11 +1,11 @@
-import app.display as display
+from .display import ANSI
 import asyncio
 
 def ask_permission(tool_name: str, args: dict) -> bool:
-    msg = f"{display.YELLOW}⚡ Tool Call{display.RESET}: {display.CYAN}{tool_name}{display.RESET}   Args: {args}"
+    msg = f"{ANSI.YELLOW}⚡ Tool Call{ANSI.RESET}: {ANSI.CYAN}{tool_name}{ANSI.RESET}   Args: {args}"
     print(msg)
 
-    msg = f"Proceed? {display.DIM}[Y/n]{display.RESET} "
+    msg = f"Proceed? {ANSI.DIM}[Y/n]{ANSI.RESET} "
     print(msg, end="", flush=True)
 
     answer = input().strip().lower()

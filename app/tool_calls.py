@@ -1,9 +1,11 @@
-from app.tools.read_file import read_file, read_file_tool_spec
-from app.tools.write_file import write_file, write_file_tool_spec
-from app.tools.bash import bash, bash_tool_spec
-from app.tools.web_fetch import web_fetch, web_fetch_tool_spec
-from app.tools.get_skills_dir import get_skills_dir, get_skills_dir_tool_spec
-from app.tools.todo import (
+from .helpers import trunc_str_with_ellipsis
+
+from .tools.read_file import read_file, read_file_tool_spec
+from .tools.write_file import write_file, write_file_tool_spec
+from .tools.bash import bash, bash_tool_spec
+from .tools.web_fetch import web_fetch, web_fetch_tool_spec
+from .tools.get_skills_dir import get_skills_dir, get_skills_dir_tool_spec
+from .tools.todo import (
     todo_add, todo_add_tool_spec,
     todo_list, todo_list_tool_spec,
     todo_update, todo_update_tool_spec,
@@ -23,6 +25,8 @@ tool_registry = {
     "todo_clear":  { "spec": todo_clear_tool_spec,  "func": todo_clear },
 }
 
+MAX_TOOL_RESULT_LENGTH = 16000
+
 def run_tool(tool_name: str, tool_args: dict) -> str:
     original_cwd = os.getcwd()
     
@@ -34,4 +38,4 @@ def run_tool(tool_name: str, tool_args: dict) -> str:
     finally:
         os.chdir(original_cwd)
     
-    return result
+    return trunc_str_with_ellipsis(MAX_TOOL_RESULT_LENGTH, result)
