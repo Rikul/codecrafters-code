@@ -14,7 +14,7 @@ class Client:
             base_url = os.environ.get("LLM_BASE_URL") or config.get("base_url", "https://openrouter.ai/api/v1")
 
         if not api_key:
-            raise RuntimeError("API_KEY is not set")
+            raise RuntimeError("LLM_API_KEY is not set")
 
         self.client = AsyncOpenAI(api_key=api_key, base_url=base_url)
 
