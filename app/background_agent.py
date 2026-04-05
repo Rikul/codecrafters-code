@@ -60,10 +60,9 @@ class BackgroundAgent:
             if not isinstance(finish_reason, str):
                 finish_reason = None
 
-            self.messages.append(assistant_message)
-
             if assistant_message.tool_calls is not None:
-    
+                self.messages.append(assistant_message)
+
                 if assistant_message.content is not None and assistant_message.content.strip() != "":
                     if self.mq:
                         await self.mq.outgoing_msg(OutgoingMessage(content=assistant_message.content.strip(), channel=self.channel, metadata=self._reply_metadata))
@@ -95,5 +94,6 @@ class BackgroundAgent:
                         await self.mq.outgoing_msg(OutgoingMessage(content=assistant_message.content.strip(), channel=self.channel, metadata=self._reply_metadata))
 
                 if finish_reason in ("stop", None):
+                    self.messages.append(assistant_message)
                     break
 

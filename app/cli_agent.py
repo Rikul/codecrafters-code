@@ -49,10 +49,9 @@ class CliAgent:
             if not isinstance(finish_reason, str):
                 finish_reason = None
 
-            self.messages.append(assistant_message)
-
             if assistant_message.tool_calls is not None:
-    
+                self.messages.append(assistant_message)
+
                 if not self.silent and assistant_message.content is not None and assistant_message.content.strip() != "":
                     print(assistant_message.content.strip())
                     
@@ -91,7 +90,8 @@ class CliAgent:
             else:
                 if assistant_message.content is not None and assistant_message.content.strip() != "":
                     print(assistant_message.content)
-                    
+
                 if finish_reason in ("stop", None):
+                    self.messages.append(assistant_message)
                     break
 
