@@ -150,7 +150,7 @@ async def test_main_silent_sets_log_level_to_warning():
         for p in patches:
             p.stop()
 
-    from app.display import log
+    from app.app_logging import log
     assert log.level == logging.WARNING
 
 

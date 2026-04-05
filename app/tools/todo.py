@@ -1,4 +1,4 @@
-from ..display import log
+from ..app_logging import log
 
 _tasks: dict[str, dict] = {}
 _next_id = 1

@@ -2,7 +2,7 @@ import asyncio
 import os
 
 from . import config
-from .display import log
+from .app_logging import log
 from .background_agent import BackgroundAgent
 from .message_queue import MessageQueue
 

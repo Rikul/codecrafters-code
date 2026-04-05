@@ -1,5 +1,5 @@
 import os
-from ..display import log
+from ..app_logging import log
 from pathlib import Path
 
 write_file_tool_spec = {

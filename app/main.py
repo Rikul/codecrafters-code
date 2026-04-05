@@ -7,7 +7,7 @@ import os
 
 
 from . import config
-from .display import log
+from .app_logging import setup_logging, log
 from .setup import ensure_home_dir
 from .cli import input_loop
 from .cli_agent import CliAgent
@@ -78,7 +78,6 @@ async def run_cli(args):
 
 
 async def run_background_agent(args):
-
     await start_server()
 
 
@@ -86,6 +85,7 @@ async def main():
     
     ensure_home_dir()
     await load_config()
+    setup_logging(level=logging.INFO)
 
     args = parse_args()
 

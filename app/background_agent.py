@@ -6,7 +6,7 @@ from . import config
 from .client import Client
 from .tool_calls import run_tool, tool_registry
 from .helpers import load_system_context
-from .display import log
+from .app_logging import log
 from .channel import Channel
 from .message import OutgoingMessage
 from .message_queue import MessageQueue

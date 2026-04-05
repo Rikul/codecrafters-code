@@ -1,9 +1,9 @@
 import asyncio
 from typing import Callable, Awaitable
-from app.channel import Channel
-from app.message import IncomingMessage, OutgoingMessage
+from .channel import Channel
+from .message import IncomingMessage, OutgoingMessage
 
-from app.display import log
+from .app_logging import log
 
 # callback type: receives outbound message and delivers it
 DeliveryFn = Callable[[OutgoingMessage], Awaitable[None]]

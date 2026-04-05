@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from app.display import log
+from .app_logging import log
 
 def load_system_context() -> str:
     """

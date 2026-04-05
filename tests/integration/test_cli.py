@@ -13,7 +13,7 @@ from unittest.mock import patch, MagicMock, AsyncMock
 
 import app.config as config_module
 from app.main import main
-from app.display import log as app_log
+from app.app_logging import log as app_log
 
 
 def _make_llm_response(content: str) -> MagicMock:

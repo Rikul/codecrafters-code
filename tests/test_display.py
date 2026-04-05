@@ -2,13 +2,13 @@ import logging
 from unittest.mock import patch, MagicMock
 
 from app.cli import ask_permission
-from app.display import log
+from app.app_logging import log
 
 
 def test_log_is_configured():
     """Test that log is a properly configured logger instance"""
     assert isinstance(log, logging.Logger)
-    assert log.name == "app.display"
+    assert log.name == "app.app_logging"
 
 
 def test_log_level_is_info_by_default():
