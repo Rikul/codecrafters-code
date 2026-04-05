@@ -1,10 +1,8 @@
 from __future__ import annotations
 
 from pathlib import Path
-from .config import get_default_config
+from .config import get_default_config, APP_NAME
 from .app_logging import log
-
-APP_NAME = "crafterscode"
 
 def ensure_home_dir() -> None:
     import os

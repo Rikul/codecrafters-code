@@ -6,7 +6,8 @@ from pathlib import Path
 
 _config : dict = {}
 
-PROJECT_HOME = Path.home() / ".crafterscode"
+APP_NAME = "crafterscode"
+PROJECT_HOME = Path.home() / f".{APP_NAME}"
 HOME_CONFIG_PATH =  PROJECT_HOME / "config.toml"
 
 def load(path: Path | str = HOME_CONFIG_PATH) -> None:
