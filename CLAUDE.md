@@ -63,7 +63,7 @@ Current tools: `read_file`, `write_file`, `bash`, `web_fetch`, `get_skills_dir`,
 
 ### System Context
 
-On startup, `load_system_context()` (`app/helpers.py`) loads markdown files from `app/system.md/` in this fixed order: `self.md`, `user.md`, `workspace.md`, `tool_instructions.md`, `skills.md`. The combined content becomes the system message prepended to `self.messages`.
+On startup, `load_system_context()` (`app/helpers.py`) loads `app/sys_instructions.md` and prepends it as the system message to `self.messages`.
 
 ### Message Queue / Channel Architecture
 

@@ -68,8 +68,7 @@ class TelegramChannel:
         log.info(f"Sending message to Telegram chat {chat_id}: {message.content}")
         await self.app.bot.send_message(
             chat_id=chat_id,
-            text=trunc_str_with_ellipsis(MAX_TG_LENGTH, message.content,
-            parse_mode=telegram.constants.ParseMode.MARKDOWN_V2),
+            text=trunc_str_with_ellipsis(MAX_TG_LENGTH, message.content)
         )
 
     async def process_message(
@@ -95,6 +94,7 @@ class TelegramChannel:
                         metadata={"chat_id": update.effective_chat.id},
                     )
                 )
+                await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=constants.ChatAction.TYPING)
             else:
                 await update.message.reply_text("Please send a non-empty message.")
         else:
