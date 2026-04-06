@@ -6,7 +6,7 @@ from .channel import Channel
 from .message import OutgoingMessage, IncomingMessage
 from .helpers import trunc_str_with_ellipsis
 
-from telegram import Update
+from telegram import Update, constants
 from telegram.ext import (
     ApplicationBuilder,
     CommandHandler,
@@ -20,9 +20,19 @@ log = logging.getLogger(__name__)
 MAX_TG_LENGTH = 2048
 
 
-async def hello(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text(f"Hello {update.effective_user.first_name}")
-
+async def whoami(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    reply_text = f"Your user ID is {update.effective_user.id} and your name is {update.effective_user.first_name}."
+    await update.message.reply_text(reply_text)
+    
+async def help(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """
+    List available commands and their descriptions.
+    """
+    reply_text = ("Available commands:\n"
+                  "/whoami - Display your user ID and name.\n"
+                  "/help - Show this help message.\n"
+                  "Just send any text message to interact with the bot.")
+    await update.message.reply_text(reply_text)
 
 class TelegramChannel:
     def __init__(
@@ -58,7 +68,8 @@ class TelegramChannel:
         log.info(f"Sending message to Telegram chat {chat_id}: {message.content}")
         await self.app.bot.send_message(
             chat_id=chat_id,
-            text=trunc_str_with_ellipsis(MAX_TG_LENGTH, message.content),
+            text=trunc_str_with_ellipsis(MAX_TG_LENGTH, message.content,
+            parse_mode=telegram.constants.ParseMode.MARKDOWN_V2),
         )
 
     async def process_message(
@@ -93,7 +104,12 @@ class TelegramChannel:
         log.info("Starting Telegram channel...")
 
         self.app = ApplicationBuilder().token(self.bot_token).build()
-        self.app.add_handler(CommandHandler("hello", hello))
+        self.app.add_handler(CommandHandler("whoami", whoami))
+        self.app.add_handler(CommandHandler("help", help))
+        # Add handler for unrecognized commands
+        self.app.add_handler(MessageHandler(filters.COMMAND, help))
+        
+        # Add handler for text messages that are not commands
         self.app.add_handler(
             MessageHandler(filters.TEXT & ~filters.COMMAND, self.process_message)
         )
