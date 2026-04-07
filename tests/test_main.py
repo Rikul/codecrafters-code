@@ -1,7 +1,6 @@
-import sys
 import logging
 import pytest
-from unittest.mock import patch, MagicMock, AsyncMock, call
+from unittest.mock import patch, MagicMock, AsyncMock
 
 from app.cli import input_loop
 from app.main import main

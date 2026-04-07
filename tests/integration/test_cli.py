@@ -7,7 +7,6 @@ agent construction, iteration logic, tool dispatch) runs as it would in
 production.
 """
 
-import logging
 import pytest
 from unittest.mock import patch, MagicMock, AsyncMock
 

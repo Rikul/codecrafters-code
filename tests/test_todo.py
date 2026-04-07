@@ -1,5 +1,4 @@
 import pytest
-from unittest.mock import patch
 import app.tools.todo as todo_module
 from app.tools.todo import TodoAddTool, TodoListTool, TodoUpdateTool, TodoClearTool
 todo_add = TodoAddTool.call

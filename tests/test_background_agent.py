@@ -4,7 +4,7 @@ from unittest.mock import patch, MagicMock, AsyncMock
 import app.config as config
 from app.background_agent import BackgroundAgent
 from app.channel import Channel
-from app.message import IncomingMessage, OutgoingMessage
+from app.message import IncomingMessage
 from app.message_queue import MessageQueue
 
 

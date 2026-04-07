@@ -1,5 +1,4 @@
 import os
-import pytest
 
 from app.tools.write_file import WriteFileTool
 write_file = WriteFileTool.call

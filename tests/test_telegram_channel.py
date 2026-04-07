@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import patch, MagicMock, AsyncMock
 
 from app.channel import Channel
-from app.message import OutgoingMessage, IncomingMessage
+from app.message import OutgoingMessage
 from app.message_queue import MessageQueue
 from app.telegram_channel import TelegramChannel
 

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-import logging, logging.handlers
+import logging
+import logging.handlers
 from pathlib import Path
 from .config import APP_NAME
 from .term_display import ANSI

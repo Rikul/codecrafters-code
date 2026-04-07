@@ -1,4 +1,3 @@
-import pytest
 from unittest.mock import patch, MagicMock
 
 from app.tools.bash import BashTool
@@ -28,7 +27,7 @@ def test_bash_captures_stdout():
 
 
 def test_bash_timeout_error():
-    with patch("app.tools.bash.subprocess.run", side_effect=Exception("timed out")) as mock_run:
+    with patch("app.tools.bash.subprocess.run", side_effect=Exception("timed out")):
         result = bash("sleep 100")
     assert "Error" in result
 
