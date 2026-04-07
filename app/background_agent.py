@@ -3,29 +3,22 @@ from __future__ import annotations
 import json
 
 from . import config
-from .client import Client
 from .tool_calls import run_tool, all_tool_specs
-from .startup import load_system_context
 from .app_logging import log
 from .channel import Channel
 from .message import OutgoingMessage
 from .message_queue import MessageQueue
+from .agent import Agent
 
-class BackgroundAgent:
+class BackgroundAgent(Agent):
 
     def __init__(self, mq: MessageQueue = None, channel: Channel = None, max_iterations: int = 100) -> None:
-        self.client = Client().get_client()
-        self.messages: list[dict] = []
-        self.max_iterations = max_iterations
+        super().__init__(max_iterations)
         self.mq = mq
         self.channel = channel
 
         if self.channel is None:
             ValueError("channel must be specified for BackgroundAgent")
-
-        system_context = load_system_context()
-        if system_context:
-            self.messages.append({"role": "system", "content": system_context})
 
     async def process_incoming(self) -> None:
         log.info("BackgroundAgent started processing incoming messages...")

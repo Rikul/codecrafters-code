@@ -3,26 +3,19 @@ from __future__ import annotations
 import json
 
 from . import config
-from .client import Client
 from .tool_calls import run_tool, all_tool_specs
-from .startup import load_system_context
 from .app_logging import log
 from .cli import ask_permission
+from .agent import Agent
 
-class CliAgent:
+class CliAgent(Agent):
 
     def __init__(self, max_iterations: int = 100, auto_approve: bool = False, silent: bool = False) -> None:
-        self.client = Client().get_client()
-        self.messages: list[dict] = []
+        super().__init__(max_iterations)
         self.auto_approve = auto_approve or silent
-        self.max_iterations = max_iterations
         self.silent = silent
 
-        system_context = load_system_context()
-        if system_context:
-            self.messages.append({"role": "system", "content": system_context})
-
-    async def agent_loop(self, message: str) -> None:
+    async def agent_loop(self, message: str,  metadata: dict = None) -> None:
         
         self.messages.append({"role": "user", "content": message})
 

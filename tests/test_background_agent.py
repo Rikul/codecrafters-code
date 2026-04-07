@@ -27,10 +27,10 @@ def make_mock_client(tool_calls=None, content="Hello!", finish_reason="stop"):
 
 def make_agent(max_iterations=10):
     mq = MessageQueue()
-    with patch("app.background_agent.Client") as MockClient:
+    with patch("app.agent.Client") as MockClient:
         mock_openai = make_mock_client()
         MockClient.return_value.get_client.return_value = mock_openai
-        with patch("app.background_agent.load_system_context", return_value=""):
+        with patch("app.agent.load_system_context", return_value=""):
             agent = BackgroundAgent(mq=mq, channel=Channel.TELEGRAM, max_iterations=max_iterations)
     agent.client = mock_openai
     return agent, mock_openai, mq
@@ -49,9 +49,9 @@ def test_agent_initializes_with_empty_messages():
 
 def test_agent_initializes_with_system_context():
     mq = MessageQueue()
-    with patch("app.background_agent.Client") as MockClient:
+    with patch("app.agent.Client") as MockClient:
         MockClient.return_value.get_client.return_value = MagicMock()
-        with patch("app.background_agent.load_system_context", return_value="system prompt"):
+        with patch("app.agent.load_system_context", return_value="system prompt"):
             agent = BackgroundAgent(mq=mq, channel=Channel.TELEGRAM)
     assert len(agent.messages) == 1
     assert agent.messages[0]["role"] == "system"
@@ -60,9 +60,9 @@ def test_agent_initializes_with_system_context():
 
 def test_agent_stores_channel_and_mq():
     mq = MessageQueue()
-    with patch("app.background_agent.Client") as MockClient:
+    with patch("app.agent.Client") as MockClient:
         MockClient.return_value.get_client.return_value = MagicMock()
-        with patch("app.background_agent.load_system_context", return_value=""):
+        with patch("app.agent.load_system_context", return_value=""):
             agent = BackgroundAgent(mq=mq, channel=Channel.TELEGRAM)
     assert agent.channel == Channel.TELEGRAM
     assert agent.mq is mq

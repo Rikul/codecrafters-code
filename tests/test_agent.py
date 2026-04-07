@@ -24,10 +24,10 @@ def make_mock_client(tool_calls=None, content="Hello!", finish_reason="stop"):
 
 
 def make_agent(auto_approve=True, silent=True, max_iterations=10):
-    with patch("app.cli_agent.Client") as MockClient:
+    with patch("app.agent.Client") as MockClient:
         mock_openai = make_mock_client()
         MockClient.return_value.get_client.return_value = mock_openai
-        with patch("app.cli_agent.load_system_context", return_value=""):
+        with patch("app.agent.load_system_context", return_value=""):
             agent = Agent(
                 auto_approve=auto_approve, silent=silent, max_iterations=max_iterations
             )
@@ -49,9 +49,9 @@ def test_agent_initializes_with_empty_messages():
 
 
 def test_agent_initializes_with_system_context():
-    with patch("app.cli_agent.Client") as MockClient:
+    with patch("app.agent.Client") as MockClient:
         MockClient.return_value.get_client.return_value = MagicMock()
-        with patch("app.cli_agent.load_system_context", return_value="system prompt"):
+        with patch("app.agent.load_system_context", return_value="system prompt"):
             agent = Agent(auto_approve=True, silent=True, max_iterations=10)
     assert len(agent.messages) == 1
     assert agent.messages[0]["role"] == "system"
@@ -91,10 +91,10 @@ async def test_agent_loop_raises_on_empty_choices():
 
 @pytest.mark.asyncio
 async def test_agent_loop_respects_max_iterations():
-    with patch("app.cli_agent.Client") as MockClient:
+    with patch("app.agent.Client") as MockClient:
         mock_client = MagicMock()
         MockClient.return_value.get_client.return_value = mock_client
-        with patch("app.cli_agent.load_system_context", return_value=""):
+        with patch("app.agent.load_system_context", return_value=""):
             agent = Agent(auto_approve=True, silent=True, max_iterations=3)
     agent.client = mock_client
 
@@ -124,10 +124,10 @@ async def test_agent_loop_respects_max_iterations():
 
 @pytest.mark.asyncio
 async def test_agent_loop_runs_tool_when_auto_approve():
-    with patch("app.cli_agent.Client") as MockClient:
+    with patch("app.agent.Client") as MockClient:
         mock_client = MagicMock()
         MockClient.return_value.get_client.return_value = mock_client
-        with patch("app.cli_agent.load_system_context", return_value=""):
+        with patch("app.agent.load_system_context", return_value=""):
             agent = Agent(auto_approve=True, silent=True, max_iterations=10)
     agent.client = mock_client
 
@@ -170,10 +170,10 @@ async def test_agent_loop_runs_tool_when_auto_approve():
 
 @pytest.mark.asyncio
 async def test_agent_loop_continues_when_finish_reason_not_stop():
-    with patch("app.cli_agent.Client") as MockClient:
+    with patch("app.agent.Client") as MockClient:
         mock_client = MagicMock()
         MockClient.return_value.get_client.return_value = mock_client
-        with patch("app.cli_agent.load_system_context", return_value=""):
+        with patch("app.agent.load_system_context", return_value=""):
             agent = Agent(auto_approve=True, silent=True, max_iterations=10)
     agent.client = mock_client
 

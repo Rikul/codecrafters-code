@@ -46,7 +46,7 @@ async def test_cli_with_simple_prompt(capsys):
     original_log_level = app_log.level
     try:
         with patch("sys.argv", ["prog", "cli", "-p", "say hello", "--silent"]), \
-             patch("app.cli_agent.Client") as MockClient, \
+             patch("app.agent.Client") as MockClient, \
              patch("app.startup.load_system_context", return_value=""), \
              patch("app.main.config.load"), \
              patch.object(config_module, "_config", {"model": "test-model"}):
