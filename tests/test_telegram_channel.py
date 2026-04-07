@@ -4,7 +4,7 @@ from unittest.mock import patch, MagicMock, AsyncMock
 from app.channel import Channel
 from app.message import OutgoingMessage, IncomingMessage
 from app.message_queue import MessageQueue
-from app.telegram_channel import TelegramChannel, hello
+from app.telegram_channel import TelegramChannel
 
 
 def make_telegram_channel(allow_from=None):
@@ -82,7 +82,7 @@ async def test_process_message_puts_to_incoming_queue():
     tc, mq = make_telegram_channel()
     update = make_update(text="do something", user_id=1, chat_id=10)
 
-    await tc.process_message(update, MagicMock())
+    await tc.process_message(update, AsyncMock())
 
     assert not mq.incoming.empty()
     msg = await mq.incoming.get()
@@ -108,7 +108,7 @@ async def test_process_message_allows_when_allow_from_empty():
     tc, mq = make_telegram_channel(allow_from=[])
     update = make_update(user_id=999, text="hi")
 
-    await tc.process_message(update, MagicMock())
+    await tc.process_message(update, AsyncMock())
 
     assert not mq.incoming.empty()
 
@@ -134,19 +134,6 @@ async def test_process_message_rejects_non_text_message():
 
     assert mq.incoming.empty()
     update.message.reply_text.assert_called_once()
-
-
-# --- hello command ---
-
-@pytest.mark.asyncio
-async def test_hello_command_replies_with_name():
-    update = MagicMock()
-    update.effective_user.first_name = "Alice"
-    update.message.reply_text = AsyncMock()
-
-    await hello(update, MagicMock())
-
-    update.message.reply_text.assert_called_once_with("Hello Alice")
 
 
 # --- error_handler ---

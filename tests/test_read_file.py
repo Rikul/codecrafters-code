@@ -2,7 +2,8 @@ import os
 import pytest
 import tempfile
 
-from app.tools.read_file import read_file
+from app.tools.read_file import ReadFileTool
+read_file = ReadFileTool.call
 
 
 def test_read_file_returns_contents(tmp_path):

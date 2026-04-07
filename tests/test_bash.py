@@ -1,7 +1,8 @@
 import pytest
 from unittest.mock import patch, MagicMock
 
-from app.tools.bash import bash
+from app.tools.bash import BashTool
+bash = BashTool.call
 
 
 def test_bash_runs_simple_command():

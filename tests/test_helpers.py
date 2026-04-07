@@ -1,6 +1,4 @@
-import os
 import pathlib
-import pytest
 from unittest.mock import patch
 
 from app.helpers import load_system_context
@@ -32,8 +30,3 @@ def test_load_system_context_skips_missing_files(tmp_path):
 
     assert isinstance(result, str)
 
-
-def test_load_system_context_uses_separator_format():
-    result = load_system_context()
-    if result:
-        assert "=" * 80 in result

@@ -4,7 +4,7 @@ import json
 
 from . import config
 from .client import Client
-from .tool_calls import run_tool, tool_registry
+from .tool_calls import run_tool, all_tool_specs
 from .helpers import load_system_context
 from .app_logging import log
 from .channel import Channel
@@ -36,7 +36,6 @@ class BackgroundAgent:
     async def agent_loop(self, message: str, metadata: dict = None) -> None:
         self._reply_metadata = metadata or {}
         self.messages.append({"role": "user", "content": message})
-        tool_specs = [tool["spec"] for tool in tool_registry.values()]
 
         iteration = 0
         while iteration < self.max_iterations:
@@ -46,7 +45,7 @@ class BackgroundAgent:
             chat = await self.client.chat.completions.create(
                 model=config.get("model", "deepseek/deepseek-v3.2"),
                 messages=self.messages,
-                tools=tool_specs,
+                tools=all_tool_specs,
                 response_format={"type": "text"},
                 max_tokens=config.get("max_tokens", 16384)
             )

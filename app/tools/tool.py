@@ -9,15 +9,5 @@ class Tool(ABC):
 
     @staticmethod
     @abstractmethod
-    def name() -> str:
-        pass
-
-    @staticmethod
-    @abstractmethod
-    def description() -> str:
-        pass
-
-    @staticmethod
-    @abstractmethod
     def spec() -> dict:
         pass
