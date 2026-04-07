@@ -29,6 +29,10 @@ class TelegramChannel(Channel):
         self.mq = mq
         mq.register(self, self.send_message)
 
+    @property
+    def channel_type(self) -> ChannelType:
+        return ChannelType.TELEGRAM
+
     async def error_handler(
         self, update: object, context: ContextTypes.DEFAULT_TYPE
     ) -> None:

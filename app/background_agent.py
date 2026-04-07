@@ -5,10 +5,12 @@ import json
 from . import config
 from .tool_calls import run_tool, all_tool_specs
 from .app_logging import log
-from .channel import Channel
+from .channel import Channel, ChannelType
 from .message import OutgoingMessage
 from .message_queue import MessageQueue
 from .agent import Agent
+
+from .message_history import MessageHistory
 
 class BackgroundAgent(Agent):
 
@@ -18,7 +20,10 @@ class BackgroundAgent(Agent):
         self.channel = channel
 
         if self.channel is None:
-            ValueError("channel must be specified for BackgroundAgent")
+            raise ValueError("channel must be specified for BackgroundAgent")
+
+        self.history = MessageHistory(channel_type=channel.channel_type.value)
+        self.messages.extend(self.history.get_history())
 
     async def process_incoming(self) -> None:
         log.info("BackgroundAgent started processing incoming messages...")
@@ -29,6 +34,7 @@ class BackgroundAgent(Agent):
     async def agent_loop(self, message: str, metadata: dict = None) -> None:
         self._reply_metadata = metadata or {}
         self.messages.append({"role": "user", "content": message})
+        self.history.add_message("user", message)
 
         iteration = 0
         while iteration < self.max_iterations:
@@ -81,11 +87,13 @@ class BackgroundAgent(Agent):
                     log.info(f"{result[:200]}...")
 
             else:
-                if assistant_message.content.strip() != "":
+                if assistant_message.content is not None and assistant_message.content.strip() != "":
                     if self.mq:
                         await self.mq.outgoing_msg(OutgoingMessage(content=assistant_message.content.strip(), channel=self.channel, metadata=self._reply_metadata))
-
+                    
                 if finish_reason in ("stop", None):
                     self.messages.append(assistant_message)
+                    if assistant_message.content:
+                        self.history.add_message("assistant", assistant_message.content.strip())
                     break
 

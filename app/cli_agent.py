@@ -7,6 +7,8 @@ from .tool_calls import run_tool, all_tool_specs
 from .app_logging import log
 from .cli import ask_permission
 from .agent import Agent
+from .message_history import MessageHistory
+from .channel import ChannelType
 
 class CliAgent(Agent):
 
@@ -14,10 +16,13 @@ class CliAgent(Agent):
         super().__init__(max_iterations)
         self.auto_approve = auto_approve or silent
         self.silent = silent
+        self.history = MessageHistory(channel_type=ChannelType.CLI.value)
+        self.messages.extend(self.history.get_history())
 
     async def agent_loop(self, message: str,  metadata: dict = None) -> None:
-        
+
         self.messages.append({"role": "user", "content": message})
+        self.history.add_message("user", message)
 
         iteration = 0
         while iteration < self.max_iterations:
@@ -85,5 +90,7 @@ class CliAgent(Agent):
 
                 if finish_reason in ("stop", None):
                     self.messages.append(assistant_message)
+                    if assistant_message.content:
+                        self.history.add_message("assistant", assistant_message.content.strip())
                     break
 

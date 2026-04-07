@@ -20,3 +20,9 @@ class Channel(ABC):
     @abstractmethod
     def error_handler(self, update, context) -> None:
         pass
+
+    @property
+    @abstractmethod
+    def channel_type(self) -> ChannelType:
+        pass
+
