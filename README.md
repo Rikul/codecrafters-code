@@ -27,7 +27,7 @@ uv sync
 
 ### API Key (Required)
 
-Set `LLM_API_KEY` in a `.env` file or as an environment variable:
+Set `LLM_API_KEY` in a `.env` file or as an environment variable. Alternatively, set `api_key` directly in `config.toml` (env var takes precedence):
 
 ```env
 LLM_API_KEY=your_api_key_here
@@ -43,6 +43,7 @@ model = "deepseek/deepseek-v3.2"
 max_iterations = 100
 max_tokens = 32768
 base_url = "https://openrouter.ai/api/v1"
+api_key = ""  # fallback if LLM_API_KEY env var is not set
 
 [telegram]
 BOT_TOKEN = ""
@@ -93,6 +94,8 @@ Then start the background agent:
 
 The agent will listen for messages on Telegram and respond via the bot. Responses are routed back to the same chat that sent the message.
 
+**Built-in Telegram commands:** `/help` — list available commands; `/whoami` — show your Telegram user ID (useful for configuring `ALLOW_FROM`).
+
 ## Testing
 
 ```bash
@@ -109,29 +112,37 @@ uv run pytest tests/integration/
 uv run pytest --cov=app --cov-report=term-missing
 ```
 
-Unit tests mock `app.cli_agent.Client` and `app.cli_agent.load_system_context`. Integration tests mock only the OpenAI HTTP client and run the full pipeline including `main()` and argparse.
+Unit tests mock `app.cli_agent.Client` and `app.cli_agent.load_system_context` (see `tests/test_startup.py`). Integration tests mock only the OpenAI HTTP client and run the full pipeline including `main()` and argparse.
 
 ## Adding New Tools
 
-1. Create `app/tools/my_tool.py` with a function and OpenAI-format spec dict
+Tools use a class-based system with the `Tool` abstract base class (`app/tools/tool.py`).
+
+1. Create `app/tools/my_tool.py` subclassing `Tool`
 2. Register in `app/tool_calls.py` `tool_registry`
 
 ```python
-MY_TOOL_SPEC = {
-    "type": "function",
-    "function": {
-        "name": "my_tool",
-        "description": "...",
-        "parameters": {
-            "type": "object",
-            "properties": {"param": {"type": "string", "description": "..."}},
-            "required": ["param"]
-        }
-    }
-}
+from .tool import Tool
 
-def my_tool(param: str) -> str:
-    return "result"
+class MyTool(Tool):
+    @staticmethod
+    def spec() -> dict:
+        return {
+            "type": "function",
+            "function": {
+                "name": "my_tool",
+                "description": "...",
+                "parameters": {
+                    "type": "object",
+                    "properties": {"param": {"type": "string", "description": "..."}},
+                    "required": ["param"]
+                }
+            }
+        }
+
+    @staticmethod
+    def call(param: str) -> str:
+        return "result"
 ```
 
 ## License
