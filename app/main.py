@@ -5,7 +5,6 @@ import asyncio
 import logging
 import os
 
-
 from . import config
 from .app_logging import setup_logging, log
 from .setup import ensure_home_dir

@@ -2,7 +2,7 @@ import asyncio
 import logging
 
 from .message_queue import MessageQueue
-from .channel import Channel
+from .channel import Channel, ChannelType
 from .message import OutgoingMessage, IncomingMessage
 from .helpers import trunc_str_with_ellipsis
 
@@ -20,10 +20,9 @@ log = logging.getLogger(__name__)
 MAX_TG_LENGTH = 2048
 
 
-
-class TelegramChannel:
+class TelegramChannel(Channel):
     def __init__(
-        self, mq: MessageQueue, bot_token: str, allow_from: list[str] = None
+        self, mq: MessageQueue, bot_token: str, allow_from: list[int] = None
     ) -> None:
         self.bot_token = bot_token
         self.allow_from = allow_from or []
@@ -98,7 +97,7 @@ class TelegramChannel:
                 await self.mq.incoming.put(
                     IncomingMessage(
                         content=content,
-                        channel=Channel.TELEGRAM,
+                        channel=ChannelType.TELEGRAM,
                         metadata={"chat_id": update.effective_chat.id},
                     )
                 )
@@ -117,7 +116,7 @@ class TelegramChannel:
         self.app.add_handler(CommandHandler("help", self.help))
 
         # Add handler for unrecognized commands
-        self.app.add_handler(MessageHandler(filters.COMMAND, help))
+        self.app.add_handler(MessageHandler(filters.COMMAND, self.help))
         
         # Add handler for text messages that are not commands
         self.app.add_handler(

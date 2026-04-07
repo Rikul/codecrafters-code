@@ -1,7 +1,22 @@
+from abc import ABC, abstractmethod
 from enum import Enum
 
-class Channel(Enum):
-    CLI = "cli",
-    TELEGRAM = "telegram",
-    DISCORD = "discord",
+class ChannelType(Enum):
+    CLI = "cli"
+    TELEGRAM = "telegram"
+    DISCORD = "discord"
     WEB = "web"
+
+class Channel(ABC):
+
+    @abstractmethod
+    async def send_message(self, message) -> None:
+        pass
+
+    @abstractmethod
+    async def process_message(self, message) -> None:
+        pass
+
+    @abstractmethod
+    def error_handler(self, update, context) -> None:
+        pass
