@@ -20,19 +20,6 @@ log = logging.getLogger(__name__)
 MAX_TG_LENGTH = 2048
 
 
-async def whoami(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    reply_text = f"Your user ID is {update.effective_user.id} and your name is {update.effective_user.first_name}."
-    await update.message.reply_text(reply_text)
-    
-async def help(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """
-    List available commands and their descriptions.
-    """
-    reply_text = ("Available commands:\n"
-                  "/whoami - Display your user ID and name.\n"
-                  "/help - Show this help message.\n"
-                  "Just send any text message to interact with the bot.")
-    await update.message.reply_text(reply_text)
 
 class TelegramChannel:
     def __init__(
@@ -54,6 +41,28 @@ class TelegramChannel:
                 "⚠ An error occurred, please try again."
             )
 
+    async def whoami(self,update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        reply_text = f"Your user ID is {update.effective_user.id} and your name is {update.effective_user.first_name}."
+        await update.message.reply_text(reply_text)
+        
+    async def help(self,update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        """
+        List available commands and their descriptions.
+        """
+        reply_text = ("Available commands:\n"
+                    "/whoami - Display your user ID and name.\n"
+                    "/help - Show this help message.\n"
+                    "Just send any text message to interact with the bot.")
+        await update.message.reply_text(reply_text)
+
+
+    async def stop(self,update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        """
+        Stop the bot gracefully.
+        """
+        # TODO: Implement a more graceful shutdown if needed
+        pass
+
     async def send_message(self, message: OutgoingMessage) -> None:
         # This function is called by the MessageQueue when there is an outgoing message for this channel
         # It should deliver the message to the user via Telegram API
@@ -66,10 +75,9 @@ class TelegramChannel:
             log.error("Cannot send Telegram message: no chat_id in message metadata")
             return
         log.info(f"Sending message to Telegram chat {chat_id}: {message.content}")
-        await self.app.bot.send_message(
-            chat_id=chat_id,
-            text=trunc_str_with_ellipsis(MAX_TG_LENGTH, message.content)
-        )
+        for i in range(0, len(message.content), MAX_TG_LENGTH):
+            chunk = message.content[i : i + MAX_TG_LENGTH]
+            await self.app.bot.send_message(chat_id=chat_id, text=chunk)
 
     async def process_message(
         self, update: Update, context: ContextTypes.DEFAULT_TYPE
@@ -104,8 +112,10 @@ class TelegramChannel:
         log.info("Starting Telegram channel...")
 
         self.app = ApplicationBuilder().token(self.bot_token).build()
-        self.app.add_handler(CommandHandler("whoami", whoami))
-        self.app.add_handler(CommandHandler("help", help))
+        self.app.add_handler(CommandHandler("whoami", self.whoami))
+        self.app.add_handler(CommandHandler("stop", self.stop))
+        self.app.add_handler(CommandHandler("help", self.help))
+
         # Add handler for unrecognized commands
         self.app.add_handler(MessageHandler(filters.COMMAND, help))
         
