@@ -5,7 +5,7 @@ import json
 from . import config
 from .client import Client
 from .tool_calls import run_tool, all_tool_specs
-from .helpers import load_system_context
+from .startup import load_system_context
 from .app_logging import log
 from .channel import Channel
 from .message import OutgoingMessage
