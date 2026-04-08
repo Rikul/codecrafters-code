@@ -9,6 +9,8 @@ An AI agent that can parse and execute user prompts, interact with the file syst
 - **Skills System**: Skills located in `app/skills/` directory (e.g., `puppeteer`)
 - **Background Agent**: Message queue and channel architecture for multi-channel delivery (Telegram, Discord, etc.)
 - **Telegram Integration**: Built-in Telegram bot channel (`app/telegram_channel.py`) for receiving and sending messages
+- **Persistent Message History**: SQLite-backed history at `~/.crafterscode/history.db`, stored per channel with token estimates
+- **Context Window Trimming**: Automatically trims conversation history to the last 100 messages (preserving the system message) to stay within model context limits
 
 
 ## Prerequisites
@@ -49,6 +51,8 @@ api_key = ""  # fallback if LLM_API_KEY env var is not set
 BOT_TOKEN = ""
 ALLOW_FROM = []  # List of allowed Telegram user IDs (integers).
 ```
+
+Message history is stored in `~/.crafterscode/history.db` (SQLite). Each channel maintains its own history with estimated token counts per message.
 
 ## Usage
 
