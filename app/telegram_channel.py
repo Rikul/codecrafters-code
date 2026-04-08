@@ -27,8 +27,16 @@ class TelegramChannel(Channel):
         self.bot_token = bot_token
         self.allow_from = allow_from or []
         self.mq = mq
+        self.stopped = False
         mq.register(self, self.send_message)
 
+    @property
+    def has_stopped(self) -> bool:
+        return self.stopped
+
+    def clear_stopped(self) -> None:
+        self.stopped = False
+    
     @property
     def channel_type(self) -> ChannelType:
         return ChannelType.TELEGRAM
@@ -63,8 +71,9 @@ class TelegramChannel(Channel):
         """
         Stop the bot gracefully.
         """
-        # TODO: Implement a more graceful shutdown if needed
-        pass
+        self.stopped = True
+        await update.message.reply_text("Stopped.")
+        log.info("Received /stop in Telegram channel, setting stopped=True.")
 
     async def send_message(self, message: OutgoingMessage) -> None:
         # This function is called by the MessageQueue when there is an outgoing message for this channel

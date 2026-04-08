@@ -26,3 +26,12 @@ class Channel(ABC):
     def channel_type(self) -> ChannelType:
         pass
 
+    @property
+    @abstractmethod
+    def has_stopped(self) -> bool:
+        pass
+
+    @abstractmethod
+    def clear_stopped(self) -> None:
+        pass
+

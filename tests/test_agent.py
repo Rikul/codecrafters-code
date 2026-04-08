@@ -28,9 +28,11 @@ def make_agent(auto_approve=True, silent=True, max_iterations=10):
         mock_openai = make_mock_client()
         MockClient.return_value.get_client.return_value = mock_openai
         with patch("app.agent.load_system_context", return_value=""):
-            agent = Agent(
-                auto_approve=auto_approve, silent=silent, max_iterations=max_iterations
-            )
+            with patch("app.cli_agent.MessageHistory") as MockHistory:
+                MockHistory.return_value.get_history.return_value = []
+                agent = Agent(
+                    auto_approve=auto_approve, silent=silent, max_iterations=max_iterations
+                )
     # Attach the mock client so callers can reconfigure it after construction
     agent.client = mock_openai
     return agent, mock_openai
@@ -52,7 +54,9 @@ def test_agent_initializes_with_system_context():
     with patch("app.agent.Client") as MockClient:
         MockClient.return_value.get_client.return_value = MagicMock()
         with patch("app.agent.load_system_context", return_value="system prompt"):
-            agent = Agent(auto_approve=True, silent=True, max_iterations=10)
+            with patch("app.cli_agent.MessageHistory") as MockHistory:
+                MockHistory.return_value.get_history.return_value = []
+                agent = Agent(auto_approve=True, silent=True, max_iterations=10)
     assert len(agent.messages) == 1
     assert agent.messages[0]["role"] == "system"
     assert agent.messages[0]["content"] == "system prompt"

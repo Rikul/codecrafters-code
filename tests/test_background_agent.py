@@ -3,9 +3,14 @@ from unittest.mock import patch, MagicMock, AsyncMock
 
 import app.config as config
 from app.background_agent import BackgroundAgent
-from app.channel import Channel
+from app.channel import ChannelType
 from app.message import IncomingMessage
 from app.message_queue import MessageQueue
+
+# Mock Channel instance (Channel is now an ABC, not an enum)
+_mock_channel = MagicMock()
+_mock_channel.channel_type = ChannelType.TELEGRAM
+_mock_channel.has_stopped = False
 
 
 def make_mock_client(tool_calls=None, content="Hello!", finish_reason="stop"):
@@ -31,7 +36,9 @@ def make_agent(max_iterations=10):
         mock_openai = make_mock_client()
         MockClient.return_value.get_client.return_value = mock_openai
         with patch("app.agent.load_system_context", return_value=""):
-            agent = BackgroundAgent(mq=mq, channel=Channel.TELEGRAM, max_iterations=max_iterations)
+            with patch("app.background_agent.MessageHistory") as MockHistory:
+                MockHistory.return_value.get_history.return_value = []
+                agent = BackgroundAgent(mq=mq, channel=_mock_channel, max_iterations=max_iterations)
     agent.client = mock_openai
     return agent, mock_openai, mq
 
@@ -52,7 +59,9 @@ def test_agent_initializes_with_system_context():
     with patch("app.agent.Client") as MockClient:
         MockClient.return_value.get_client.return_value = MagicMock()
         with patch("app.agent.load_system_context", return_value="system prompt"):
-            agent = BackgroundAgent(mq=mq, channel=Channel.TELEGRAM)
+            with patch("app.background_agent.MessageHistory") as MockHistory:
+                MockHistory.return_value.get_history.return_value = []
+                agent = BackgroundAgent(mq=mq, channel=_mock_channel)
     assert len(agent.messages) == 1
     assert agent.messages[0]["role"] == "system"
     assert agent.messages[0]["content"] == "system prompt"
@@ -63,8 +72,10 @@ def test_agent_stores_channel_and_mq():
     with patch("app.agent.Client") as MockClient:
         MockClient.return_value.get_client.return_value = MagicMock()
         with patch("app.agent.load_system_context", return_value=""):
-            agent = BackgroundAgent(mq=mq, channel=Channel.TELEGRAM)
-    assert agent.channel == Channel.TELEGRAM
+            with patch("app.background_agent.MessageHistory") as MockHistory:
+                MockHistory.return_value.get_history.return_value = []
+                agent = BackgroundAgent(mq=mq, channel=_mock_channel)
+    assert agent.channel == _mock_channel
     assert agent.mq is mq
 
 
@@ -102,7 +113,7 @@ async def test_agent_loop_sends_outgoing_message():
     assert not mq.outgoing.empty()
     msg = await mq.outgoing.get()
     assert msg.content == "Hello!"
-    assert msg.channel == Channel.TELEGRAM
+    assert msg.channel == _mock_channel
     assert msg.metadata == {"chat_id": 123}
 
 
@@ -215,10 +226,42 @@ async def test_agent_loop_sends_inline_content_with_tool_calls():
 
 
 @pytest.mark.asyncio
+async def test_agent_loop_breaks_when_channel_stopped():
+    """Loop should exit immediately when channel.has_stopped is True."""
+    agent, mock_client, _ = make_agent()
+    agent.channel.has_stopped = True
+
+    await agent.agent_loop("do something")
+
+    mock_client.chat.completions.create.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_agent_loop_clears_stopped_after_completion():
+    """channel.clear_stopped() must be called after agent_loop finishes."""
+    mq = MessageQueue()
+    local_channel = MagicMock()
+    local_channel.channel_type = ChannelType.TELEGRAM
+    local_channel.has_stopped = False
+
+    with patch("app.agent.Client") as MockClient:
+        MockClient.return_value.get_client.return_value = make_mock_client()
+        with patch("app.agent.load_system_context", return_value=""):
+            with patch("app.background_agent.MessageHistory") as MockHistory:
+                MockHistory.return_value.get_history.return_value = []
+                agent = BackgroundAgent(mq=mq, channel=local_channel, max_iterations=10)
+    agent.client = make_mock_client()
+
+    await agent.agent_loop("Hello")
+
+    local_channel.clear_stopped.assert_called_once()
+
+
+@pytest.mark.asyncio
 async def test_process_incoming_dispatches_to_agent_loop():
     agent, mock_client, mq = make_agent()
 
-    incoming = IncomingMessage(content="hello from telegram", channel=Channel.TELEGRAM, metadata={"chat_id": 99})
+    incoming = IncomingMessage(content="hello from telegram", channel=ChannelType.TELEGRAM, metadata={"chat_id": 99})
     await mq.incoming.put(incoming)
 
     # Run process_incoming for one iteration then cancel

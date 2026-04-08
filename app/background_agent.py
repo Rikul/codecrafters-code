@@ -40,6 +40,10 @@ class BackgroundAgent(Agent):
         while iteration < self.max_iterations:
             iteration += 1
 
+            if self.channel.has_stopped:
+                log.info("Channel has been stopped, breaking out of agent loop.")
+                break
+
             self._trim_messages()
             log.info("chat.completions.create...")
             chat = await self.client.chat.completions.create(
@@ -97,4 +101,6 @@ class BackgroundAgent(Agent):
                     if assistant_message.content:
                         self.history.add_message("assistant", assistant_message.content.strip())
                     break
-
+        
+        # Clear any stopped state on the channel after finishing processing this message
+        self.channel.clear_stopped()

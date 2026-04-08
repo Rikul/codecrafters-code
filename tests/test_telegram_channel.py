@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import patch, MagicMock, AsyncMock
 
-from app.channel import Channel
+from app.channel import ChannelType
 from app.message import OutgoingMessage
 from app.message_queue import MessageQueue
 from app.telegram_channel import TelegramChannel
@@ -44,7 +44,7 @@ async def test_send_message_sends_to_correct_chat():
     tc.app = MagicMock()
     tc.app.bot.send_message = AsyncMock()
 
-    msg = OutgoingMessage(content="hi", channel=Channel.TELEGRAM, metadata={"chat_id": 42})
+    msg = OutgoingMessage(content="hi", channel=ChannelType.TELEGRAM, metadata={"chat_id": 42})
     await tc.send_message(msg)
 
     tc.app.bot.send_message.assert_called_once_with(chat_id=42, text="hi")
@@ -57,7 +57,7 @@ async def test_send_message_skips_when_no_chat_id(caplog):
     tc.app = MagicMock()
     tc.app.bot.send_message = AsyncMock()
 
-    msg = OutgoingMessage(content="hi", channel=Channel.TELEGRAM, metadata={})
+    msg = OutgoingMessage(content="hi", channel=ChannelType.TELEGRAM, metadata={})
     with caplog.at_level(logging.ERROR):
         await tc.send_message(msg)
 
@@ -87,7 +87,7 @@ async def test_process_message_puts_to_incoming_queue():
     assert not mq.incoming.empty()
     msg = await mq.incoming.get()
     assert msg.content == "do something"
-    assert msg.channel == Channel.TELEGRAM
+    assert msg.channel == ChannelType.TELEGRAM
     assert msg.metadata == {"chat_id": 10}
 
 
@@ -153,6 +153,41 @@ async def test_error_handler_notifies_user_on_chat_update():
     update.effective_message.reply_text.assert_called_once()
     assert "error" in update.effective_message.reply_text.call_args[0][0].lower()
 
+
+# --- stop ---
+
+@pytest.mark.asyncio
+async def test_stop_sets_has_stopped():
+    tc, _ = make_telegram_channel()
+    assert tc.has_stopped is False
+
+    update = make_update()
+    await tc.stop(update, MagicMock())
+
+    assert tc.has_stopped is True
+
+
+@pytest.mark.asyncio
+async def test_stop_replies_to_user():
+    tc, _ = make_telegram_channel()
+    update = make_update()
+    await tc.stop(update, MagicMock())
+
+    update.message.reply_text.assert_called_once_with("Stopped.")
+
+
+@pytest.mark.asyncio
+async def test_clear_stopped_resets_state():
+    tc, _ = make_telegram_channel()
+    update = make_update()
+    await tc.stop(update, MagicMock())
+    assert tc.has_stopped is True
+
+    tc.clear_stopped()
+    assert tc.has_stopped is False
+
+
+# --- error_handler ---
 
 @pytest.mark.asyncio
 async def test_error_handler_handles_non_update_object():
