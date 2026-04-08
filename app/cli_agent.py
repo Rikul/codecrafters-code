@@ -6,7 +6,7 @@ from . import config
 from .tool_calls import run_tool, all_tool_specs
 from .app_logging import log
 from .cli import ask_permission
-from .agent import Agent
+from .agent import Agent, MAX_CONTEXT_MESSAGES
 from .message_history import MessageHistory
 from .channel import ChannelType
 
@@ -17,7 +17,7 @@ class CliAgent(Agent):
         self.auto_approve = auto_approve or silent
         self.silent = silent
         self.history = MessageHistory(channel_type=ChannelType.CLI.value)
-        self.messages.extend(self.history.get_history())
+        self.messages.extend(self.history.get_history(limit=MAX_CONTEXT_MESSAGES))
 
     async def agent_loop(self, message: str,  metadata: dict = None) -> None:
 
@@ -28,6 +28,7 @@ class CliAgent(Agent):
         while iteration < self.max_iterations:
             iteration += 1
 
+            self._trim_messages()
             log.info("chat.completions.create...")
             chat = await self.client.chat.completions.create(
                 model=config.get("model", "deepseek/deepseek-v3.2"),

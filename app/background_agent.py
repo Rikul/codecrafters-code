@@ -8,7 +8,7 @@ from .app_logging import log
 from .channel import Channel, ChannelType
 from .message import OutgoingMessage
 from .message_queue import MessageQueue
-from .agent import Agent
+from .agent import Agent, MAX_CONTEXT_MESSAGES
 
 from .message_history import MessageHistory
 
@@ -23,7 +23,7 @@ class BackgroundAgent(Agent):
             raise ValueError("channel must be specified for BackgroundAgent")
 
         self.history = MessageHistory(channel_type=channel.channel_type.value)
-        self.messages.extend(self.history.get_history())
+        self.messages.extend(self.history.get_history(limit=MAX_CONTEXT_MESSAGES))
 
     async def process_incoming(self) -> None:
         log.info("BackgroundAgent started processing incoming messages...")
@@ -40,6 +40,7 @@ class BackgroundAgent(Agent):
         while iteration < self.max_iterations:
             iteration += 1
 
+            self._trim_messages()
             log.info("chat.completions.create...")
             chat = await self.client.chat.completions.create(
                 model=config.get("model", "deepseek/deepseek-v3.2"),

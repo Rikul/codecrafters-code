@@ -31,8 +31,8 @@ def parse_args():
 
     cli_parser = subparsers.add_parser("cli", help="Run interactive CLI")
 
-    cli_parser.add_argument("-p", "--prompt", metavar="PROMPT", dest="prompt", type=str, required=True, 
-                   help="The initial prompt for the agent")
+    cli_parser.add_argument("-p", "--prompt", metavar="PROMPT", dest="prompt", type=str, required=False, 
+                   help="The initial prompt for the agent", default=None)
     cli_parser.add_argument("-y", "--auto-approve", dest="auto_approve", action="store_true", 
                    help="Allow the agent to call tools without asking for permission")
     cli_parser.add_argument("-x", "--no-repl", dest="no_repl", action="store_true", 
@@ -62,7 +62,11 @@ async def run_cli(args):
     log.info("Starting agent...")
     agent = CliAgent(auto_approve=args.auto_approve or args.silent, max_iterations=args.max_iterations, silent=args.silent)
 
-    await agent.agent_loop(args.prompt)
+    if args.prompt:
+        await agent.agent_loop(args.prompt)
+    elif not (args.no_repl or args.silent):
+        print("Starting interactive session. Type your prompts below. Press Ctrl+C to exit.")
+    
     if args.no_repl or args.silent:
         return
 
