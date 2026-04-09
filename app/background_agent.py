@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import json
 
 from . import config
@@ -40,22 +41,23 @@ class BackgroundAgent(Agent):
         while iteration < self.max_iterations:
             iteration += 1
 
-            if self.channel.has_stopped:
-                log.info("Channel has been stopped, breaking out of agent loop.")
-                break
-
             self._trim_messages()
             log.info("chat.completions.create...")
-            chat = await self.client.chat.completions.create(
-                model=config.get("model", "deepseek/deepseek-v3.2"),
-                messages=self.messages,
-                tools=all_tool_specs,
-                response_format={"type": "text"},
-                max_tokens=config.get("max_tokens", 16384)
-            )
+            try:
+                chat = await self.client.chat.completions.create(
+                    model=config.get("model", "deepseek/deepseek-v3.2"),
+                    messages=self.messages,
+                    tools=all_tool_specs,
+                    response_format={"type": "text"},
+                    max_tokens=config.get("max_tokens", 16384)
+                )
+            except asyncio.CancelledError:
+                log.info("agent_loop cancelled during API call, shutting down.")
+                raise
 
             if not chat.choices or len(chat.choices) == 0:
-                raise RuntimeError("no choices in response")
+                log.warning("No choices in API response, ending agent loop.")
+                break
 
             choice = chat.choices[0]
             assistant_message = choice.message
@@ -101,6 +103,8 @@ class BackgroundAgent(Agent):
                     if assistant_message.content:
                         self.history.add_message("assistant", assistant_message.content.strip())
                     break
-        
-        # Clear any stopped state on the channel after finishing processing this message
-        self.channel.clear_stopped()
+    
+            if self.channel.has_stopped:
+                log.info("Channel has been stopped, breaking out of agent loop.")
+                self.channel.clear_stopped()
+                break
