@@ -15,7 +15,7 @@ from .message_history import MessageHistory
 
 class BackgroundAgent(Agent):
 
-    def __init__(self, mq: MessageQueue = None, channel: Channel = None, max_iterations: int = 100) -> None:
+    def __init__(self, mq: MessageQueue = None, channel: Channel = None, max_iterations: int = 200) -> None:
         super().__init__(max_iterations)
         self.mq = mq
         self.channel = channel
@@ -56,8 +56,8 @@ class BackgroundAgent(Agent):
                 raise
 
             if not chat.choices or len(chat.choices) == 0:
-                log.warning("No choices in API response, ending agent loop.")
-                break
+                log.warning("No choices in API response, retrying...")
+                continue
 
             choice = chat.choices[0]
             assistant_message = choice.message
