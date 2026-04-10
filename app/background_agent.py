@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import json
 
 from . import config
@@ -43,17 +42,13 @@ class BackgroundAgent(Agent):
 
             self._trim_messages()
             log.info("chat.completions.create...")
-            try:
-                chat = await self.client.chat.completions.create(
-                    model=config.get("model", "deepseek/deepseek-v3.2"),
-                    messages=self.messages,
-                    tools=all_tool_specs,
-                    response_format={"type": "text"},
-                    max_tokens=config.get("max_tokens", 16384)
-                )
-            except asyncio.CancelledError:
-                log.info("agent_loop cancelled during API call, shutting down.")
-                raise
+            chat = await self.client.chat.completions.create(
+                model=config.get("model", "deepseek/deepseek-v3.2"),
+                messages=self.messages,
+                tools=all_tool_specs,
+                response_format={"type": "text"},
+                max_tokens=config.get("max_tokens", 16384)
+            )
 
             if not chat.choices or len(chat.choices) == 0:
                 log.warning("No choices in API response, retrying...")
@@ -68,17 +63,20 @@ class BackgroundAgent(Agent):
             if assistant_message.tool_calls is not None:
                 self.messages.append(assistant_message)
 
-                if assistant_message.content is not None and assistant_message.content.strip() != "":
-                    if self.mq:
-                        await self.mq.outgoing_msg(OutgoingMessage(content=assistant_message.content.strip(), channel=self.channel, metadata=self._reply_metadata))
+                llm_text = assistant_message.content.strip().rstrip(":").strip() if assistant_message.content else ""
 
                 for tool_call in assistant_message.tool_calls:
-
                     try:
                         tool_name = tool_call.function.name
                         tool_args = json.loads(tool_call.function.arguments)
+                        first_arg = str(next(iter(tool_args.values()), ""))[:50] if tool_args else ""
+                        tool_status = f"running {tool_name} [{first_arg}]..."
+                        status_msg = f"{llm_text}: {tool_status}" if llm_text else tool_status
+                        llm_text = ""  # only prepend on first tool call
+                        if self.mq:
+                            await self.mq.outgoing_msg(OutgoingMessage(content=status_msg, channel=self.channel, metadata=self._reply_metadata))
                         result = run_tool(tool_name=tool_name, tool_args=tool_args)
- 
+
                     except Exception as e:
                         result = f"Error running tool {tool_name}: {str(e)}"
                         log.error(result)
