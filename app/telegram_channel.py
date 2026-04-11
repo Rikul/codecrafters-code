@@ -123,7 +123,14 @@ class TelegramChannel(Channel):
     def start(self) -> None:
         log.info("Starting Telegram channel...")
 
-        self.app = ApplicationBuilder().token(self.bot_token).build()
+        self.app = (
+            ApplicationBuilder()
+            .token(self.bot_token)
+            .connect_timeout(30)
+            .read_timeout(30)
+            .write_timeout(30)
+            .build()
+        )
         self.app.add_handler(CommandHandler("whoami", self.whoami))
         self.app.add_handler(CommandHandler("stop", self.stop))
         self.app.add_handler(CommandHandler("help", self.help))

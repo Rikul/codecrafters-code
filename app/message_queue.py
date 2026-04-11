@@ -32,7 +32,11 @@ class MessageQueue:
             log.info(f"Processing outgoing message for channel {message.channel}: {message.content}")
             fn = self._delivery.get(message.channel)
             if not fn:
-                raise ValueError(f"No delivery function registered for channel {message.channel}")
-            
-            await fn(message)
+                log.error(f"No delivery function registered for channel {message.channel}, dropping message")
+                continue
+
+            try:
+                await fn(message)
+            except Exception as e:
+                log.error(f"Failed to deliver message to channel {message.channel}: {e}")
             

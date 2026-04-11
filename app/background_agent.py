@@ -29,7 +29,10 @@ class BackgroundAgent(Agent):
         log.info("BackgroundAgent started processing incoming messages...")
         while True:
             msg = await self.mq.incoming.get()
-            await self.agent_loop(msg.content, msg.metadata)
+            try:
+                await self.agent_loop(msg.content, msg.metadata)
+            except Exception as e:
+                log.error(f"Agent loop error: {e}")
 
     async def agent_loop(self, message: str, metadata: dict = None) -> None:
         self._reply_metadata = metadata or {}
