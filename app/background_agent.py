@@ -96,7 +96,7 @@ class BackgroundAgent(Agent):
                     if self.mq:
                         await self.mq.outgoing_msg(OutgoingMessage(content=assistant_message.content.strip(), channel=self.channel, metadata=self._reply_metadata))
                     
-                if finish_reason in ("stop", None):
+                if finish_reason == "stop":
                     self.messages.append(assistant_message)
                     if assistant_message.content:
                         self.history.add_message("assistant", assistant_message.content.strip())
