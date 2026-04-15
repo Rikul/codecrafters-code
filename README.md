@@ -100,6 +100,24 @@ The agent will listen for messages on Telegram and respond via the bot. Response
 
 **Built-in Telegram commands:** `/help` — list available commands; `/whoami` — show your Telegram user ID (useful for configuring `ALLOW_FROM`).
 
+## Roadmap
+
+- **Context Usage Tracking**: Enhanced monitoring of token consumption, cost estimation, and usage analytics per channel/model
+- **Intelligent Context Trimming/Compaction**: Advanced context management with summarization, selective trimming, and priority-based message retention
+- **MCP Support**: Integration with Model Context Protocol for external data sources, tools, and state management
+- **Discord Integration**: Discord bot with slash commands, rich embeds, and channel permissions
+- **Slack Integration**: Slack app with interactive messages, modals, and workspace management
+- **WhatsApp Support**: WhatsApp Business API integration via providers like Twilio or MessageBird
+- **Email Support**: IMAP/SMTP integration for reading and sending emails, attachment handling, and mailbox management
+- **Anthropic OAuth**: Direct integration with Claude API using OAuth 2.0
+- **Codex OAuth**: OpenAI Codex API authentication
+- **GitHub OAuth**: Access to repositories, issues, and GitHub Actions
+- **Gemini OAuth**: Google Gemini API authentication with Google Cloud credentials
+- **Expanded Tool Library**: More file operations, system monitoring, database interactions, and cloud services
+- **Useful Skills**: Advanced skills for web scraping (headless browsers), data analysis (Pandas, NumPy), document processing (PDF, DOCX), and media manipulation
+- **Web Dashboard**: Admin interface for monitoring agents, configuring channels, and viewing analytics
+- **API Server**: REST/WebSocket API for programmatic access to agent capabilities
+
 ## Testing
 
 ```bash
