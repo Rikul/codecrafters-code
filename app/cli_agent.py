@@ -89,7 +89,7 @@ class CliAgent(Agent):
                 if assistant_message.content is not None and assistant_message.content.strip() != "":
                     print(assistant_message.content)
 
-                if finish_reason in ("stop", None):
+                if finish_reason == "stop":
                     self.messages.append(assistant_message)
                     if assistant_message.content:
                         self.history.add_message("assistant", assistant_message.content.strip())
