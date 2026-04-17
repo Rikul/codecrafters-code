@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import json
 
 from . import config
@@ -39,7 +40,9 @@ class BackgroundAgent(Agent):
         self.messages.append({"role": "user", "content": message})
         self.history.add_message("user", message)
 
+        MAX_RETRIES = 5
         iteration = 0
+        empty_retries = 0
         while iteration < self.max_iterations:
             iteration += 1
 
@@ -54,8 +57,15 @@ class BackgroundAgent(Agent):
             )
 
             if not chat.choices or len(chat.choices) == 0:
-                log.warning("No choices in API response, retrying...")
+                empty_retries += 1
+                if empty_retries > MAX_RETRIES:
+                    raise RuntimeError(f"No choices in API response after {MAX_RETRIES} retries")
+                wait = min(2 ** empty_retries, 60)
+                log.warning(f"No choices in API response, retrying in {wait}s (attempt {empty_retries}/{MAX_RETRIES})")
+                await asyncio.sleep(wait)
                 continue
+
+            empty_retries = 0
 
             choice = chat.choices[0]
             assistant_message = choice.message
@@ -107,5 +117,7 @@ class BackgroundAgent(Agent):
     
             if self.channel.has_stopped:
                 log.info("Channel has been stopped, breaking out of agent loop.")
-                self.channel.clear_stopped()
                 break
+        
+        self.channel.clear_stopped()
+

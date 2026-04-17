@@ -23,9 +23,11 @@ def _make_llm_response(content: str) -> MagicMock:
 
     mock_choice = MagicMock()
     mock_choice.message = mock_message
+    mock_choice.finish_reason = "stop"
 
     mock_response = MagicMock()
     mock_response.choices = [mock_choice]
+
     return mock_response
 
 
