@@ -1,6 +1,7 @@
 import pathlib
 
-from app.tools.get_skills_dir import get_skills_dir
+from app.tools.get_skills_dir import GetSkillsDirTool
+get_skills_dir = GetSkillsDirTool.call
 
 
 def test_get_skills_dir_returns_string():

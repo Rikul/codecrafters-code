@@ -1,7 +1,10 @@
 import pytest
-from unittest.mock import patch
 import app.tools.todo as todo_module
-from app.tools.todo import todo_add, todo_list, todo_update, todo_clear
+from app.tools.todo import TodoAddTool, TodoListTool, TodoUpdateTool, TodoClearTool
+todo_add = TodoAddTool.call
+todo_list = TodoListTool.call
+todo_update = TodoUpdateTool.call
+todo_clear = TodoClearTool.call
 
 
 @pytest.fixture(autouse=True)

@@ -1,7 +1,7 @@
-import pytest
 from unittest.mock import patch, MagicMock
 
-from app.tools.web_fetch import web_fetch
+from app.tools.web_fetch import WebFetchTool
+web_fetch = WebFetchTool.call
 
 
 def _make_completed_process(stdout="", returncode=0, stderr=""):

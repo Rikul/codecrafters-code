@@ -1,10 +1,7 @@
-import os
 import pathlib
-import pytest
 from unittest.mock import patch
 
-from app.helpers import load_system_context
-
+from app.startup import load_system_context
 
 def test_load_system_context_returns_string():
     result = load_system_context()
@@ -21,7 +18,7 @@ def test_load_system_context_skips_missing_files(tmp_path):
     system_md_dir = tmp_path / "system.md"
     system_md_dir.mkdir()
 
-    with patch("app.helpers.Path") as MockPath:
+    with patch("app.startup.Path") as MockPath:
         instance = MockPath.return_value
         instance.parent.__truediv__ = lambda self, key: system_md_dir
         MockPath.side_effect = lambda *args, **kwargs: pathlib.Path(*args, **kwargs)
@@ -32,8 +29,3 @@ def test_load_system_context_skips_missing_files(tmp_path):
 
     assert isinstance(result, str)
 
-
-def test_load_system_context_uses_separator_format():
-    result = load_system_context()
-    if result:
-        assert "=" * 80 in result

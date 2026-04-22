@@ -7,13 +7,12 @@ agent construction, iteration logic, tool dispatch) runs as it would in
 production.
 """
 
-import logging
 import pytest
 from unittest.mock import patch, MagicMock, AsyncMock
 
 import app.config as config_module
 from app.main import main
-from app.display import log as app_log
+from app.app_logging import log as app_log
 
 
 def _make_llm_response(content: str) -> MagicMock:
@@ -24,9 +23,11 @@ def _make_llm_response(content: str) -> MagicMock:
 
     mock_choice = MagicMock()
     mock_choice.message = mock_message
+    mock_choice.finish_reason = "stop"
 
     mock_response = MagicMock()
     mock_response.choices = [mock_choice]
+
     return mock_response
 
 
@@ -46,9 +47,9 @@ async def test_cli_with_simple_prompt(capsys):
     # other tests that check the default level are not affected.
     original_log_level = app_log.level
     try:
-        with patch("sys.argv", ["prog", "-p", "say hello", "--silent"]), \
+        with patch("sys.argv", ["prog", "cli", "-p", "say hello", "--silent"]), \
              patch("app.agent.Client") as MockClient, \
-             patch("app.agent.load_system_context", return_value=""), \
+             patch("app.startup.load_system_context", return_value=""), \
              patch("app.main.config.load"), \
              patch.object(config_module, "_config", {"model": "test-model"}):
 

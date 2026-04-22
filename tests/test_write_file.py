@@ -1,7 +1,7 @@
 import os
-import pytest
 
-from app.tools.write_file import write_file
+from app.tools.write_file import WriteFileTool
+write_file = WriteFileTool.call
 
 
 def test_write_file_creates_file(tmp_path):

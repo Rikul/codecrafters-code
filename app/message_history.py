@@ -1,0 +1,73 @@
+from __future__ import annotations
+
+import sqlite3
+from datetime import datetime
+from pathlib import Path
+from .app_logging import log
+from .config import APP_NAME
+
+HISTORY_DB = Path.home() / f".{APP_NAME}" / "history.db"
+
+
+def _est_tokens(content: str) -> int:
+    return max(1, len(content) // 4)
+
+
+class MessageHistory:
+    def __init__(self, channel_type: str, db_path: Path = HISTORY_DB):
+        self.db_path = db_path
+        self.channel = channel_type
+        self._ensure_db()
+
+    def _ensure_db(self):
+        try:
+            self.db_path.parent.mkdir(parents=True, exist_ok=True)
+            with sqlite3.connect(self.db_path) as conn:
+                conn.execute("""
+                    CREATE TABLE IF NOT EXISTS messages (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        channel text NOT NULL,
+                        dir text,
+                        project text,
+                        role TEXT NOT NULL,
+                        content TEXT NOT NULL,
+                        timestamp TEXT NOT NULL,
+                        est_tokens INTEGER
+                    )
+                """)
+                conn.execute("""
+                    CREATE INDEX IF NOT EXISTS idx_messages_channel ON messages(channel)
+                """)
+
+                # migrate existing DBs that don't have est_tokens yet
+                try:
+                    conn.execute("ALTER TABLE messages ADD COLUMN est_tokens INTEGER")
+                except sqlite3.OperationalError:
+                    pass  # column already exists
+                
+                conn.commit()
+
+        except sqlite3.Error as e:
+            log.error(f"Error creating message history database: {str(e)}")
+            raise
+
+    def add_message(self, role: str, content: str, dir: str | None = None, project: str | None = None):
+        timestamp = datetime.now().isoformat()
+        est = _est_tokens(content)
+        with sqlite3.connect(self.db_path) as conn:
+            conn.execute(
+                "INSERT INTO messages (channel, role, content, timestamp, dir, project, est_tokens) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                (self.channel, role, content, timestamp, dir, project, est)
+            )
+            conn.commit()
+        log.info(f"Added message to history: role={role}, est_tokens={est}, content={content[:30]}...")
+
+    def get_history(self, limit: int = 100) -> list[dict]:
+        with sqlite3.connect(self.db_path) as conn:
+            rows = conn.execute("""SELECT role, content FROM messages
+                                    WHERE channel = ?
+                                    ORDER BY id DESC LIMIT ?""", (self.channel, limit)).fetchall()
+            return [{"role": row[0], "content": row[1]} for row in reversed(rows)]
+
+    def prune_old_messages(self, older_than_days: int) -> None:
+        pass

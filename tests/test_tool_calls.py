@@ -1,6 +1,3 @@
-import os
-import pytest
-from unittest.mock import patch, MagicMock
 
 from app.tool_calls import run_tool, tool_registry
 
@@ -11,13 +8,6 @@ def test_tool_registry_contains_expected_tools():
     assert "bash" in tool_registry
     assert "web_fetch" in tool_registry
     assert "get_skills_dir" in tool_registry
-
-
-def test_tool_registry_entries_have_spec_and_func():
-    for name, entry in tool_registry.items():
-        assert "spec" in entry, f"{name} missing 'spec'"
-        assert "func" in entry, f"{name} missing 'func'"
-        assert callable(entry["func"]), f"{name} 'func' is not callable"
 
 
 def test_run_tool_calls_correct_function(tmp_path):

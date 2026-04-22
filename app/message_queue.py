@@ -1,10 +1,9 @@
 import asyncio
-from dataclasses import dataclass, field
 from typing import Callable, Awaitable
-from app.channel import Channel
-from app.message import IncomingMessage, OutgoingMessage
+from .channel import Channel
+from .message import IncomingMessage, OutgoingMessage
 
-from app.display import log
+from .app_logging import log
 
 # callback type: receives outbound message and delivers it
 DeliveryFn = Callable[[OutgoingMessage], Awaitable[None]]
@@ -20,9 +19,11 @@ class MessageQueue:
         self._delivery[channel] = fn
 
     async def incoming_msg(self, message: IncomingMessage):
+        log.info(f"Received incoming message for channel {message.channel}: {message.content}")
         await self.incoming.put(message)
 
     async def outgoing_msg(self, message: OutgoingMessage):
+        log.info(f"Queueing outgoing message for channel {message.channel}: {message.content}")
         await self.outgoing.put(message)
 
     async def process_outgoing(self):
@@ -31,7 +32,11 @@ class MessageQueue:
             log.info(f"Processing outgoing message for channel {message.channel}: {message.content}")
             fn = self._delivery.get(message.channel)
             if not fn:
-                raise ValueError(f"No delivery function registered for channel {message.channel}")
-            
-            await fn(message)
+                log.error(f"No delivery function registered for channel {message.channel}, dropping message")
+                continue
+
+            try:
+                await fn(message)
+            except Exception as e:
+                log.error(f"Failed to deliver message to channel {message.channel}: {e}")
             
