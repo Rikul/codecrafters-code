@@ -12,6 +12,8 @@ from app.channel import Channel
 from app.message import OutgoingMessage, IncomingMessage
 from app.message_queue import MessageQueue
 from app.cli import ask_permission
+from app.commands import is_command, handle_command
+
 
 class Agent:
 
@@ -31,7 +33,32 @@ class Agent:
     async def process_incoming(self) -> None:
         while True:
             msg = await self.mq.incoming.get()
-            await self.agent_loop(msg.content)
+            await self.process_message(msg.content)
+
+    async def process_message(self, message: str) -> None:
+        """Process a message - check if it's a command or regular message."""
+        # Check if this is a command
+        if is_command(message):
+            log.info(f"Processing command: {message[:50]}...")
+            try:
+                # Handle command
+                response = await handle_command(message, self.channel)
+                
+                # Send command response back to user
+                if self.mq:
+                    await self.mq.outgoing_msg(OutgoingMessage(content=response, channel=self.channel))
+                
+                return  # Command handled, don't process as normal message
+            
+            except Exception as e:
+                error_msg = f"Error processing command: {str(e)}"
+                log.error(error_msg)
+                if self.mq:
+                    await self.mq.outgoing_msg(OutgoingMessage(content=error_msg, channel=self.channel))
+                return
+        
+        # Not a command, process as normal agent message
+        await self.agent_loop(message)
 
     async def agent_loop(self, message: str) -> None:
         
