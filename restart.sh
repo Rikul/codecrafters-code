@@ -1,0 +1,35 @@
+#!/bin/bash
+# Restart the background agent with the latest code.
+#
+# Run directly:        ./restart.sh
+# Run from agent bash tool (non-blocking):
+#   nohup ./restart.sh > /tmp/restart.log 2>&1 & echo "Restart initiated"
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PID_FILE="$HOME/.crafterscode/background.pid"
+LOG_FILE="$HOME/.crafterscode/background.log"
+
+cd "$SCRIPT_DIR"
+
+# Stop the existing agent
+if [ -f "$PID_FILE" ]; then
+    OLD_PID=$(cat "$PID_FILE")
+    if kill -0 "$OLD_PID" 2>/dev/null; then
+        echo "[restart] Stopping process $OLD_PID..."
+        kill "$OLD_PID"
+        sleep 2
+    fi
+    rm -f "$PID_FILE"
+else
+    # Fallback: find by command line (no PID file on first run)
+    pkill -f "app\.main.*background" 2>/dev/null && sleep 2 || true
+fi
+
+# Start new agent, record PID
+echo "[restart] Starting background agent..."
+nohup "$SCRIPT_DIR/run.sh" background >> "$LOG_FILE" 2>&1 &
+NEW_PID=$!
+echo "$NEW_PID" > "$PID_FILE"
+echo "[restart] Started (PID $NEW_PID). Logs: $LOG_FILE"
