@@ -15,7 +15,7 @@ from .message_history import MessageHistory
 
 class BackgroundAgent(Agent):
 
-    def __init__(self, mq: MessageQueue = None, channel: Channel = None, max_iterations: int = 200) -> None:
+    def __init__(self, mq: MessageQueue = None, channel: Channel = None, max_iterations: int = 250) -> None:
         super().__init__(max_iterations)
         self.mq = mq
         self.channel = channel
@@ -36,24 +36,23 @@ class BackgroundAgent(Agent):
                 log.error(f"Agent loop error: {e}")
 
     async def agent_loop(self, message: str, metadata: dict = None) -> None:
-        self._reply_metadata = metadata or {}
-        self.messages.append({"role": "user", "content": message})
-        self.history.add_message("user", message)
+        self._trim_messages()
 
-        MAX_RETRIES = 5
+        session_messages = self.messages[:] + [{"role": "user", "content": message}]
+        self._reply_metadata = metadata or {}
         iteration = 0
         empty_retries = 0
+        assistant_message = None
+        MAX_RETRIES = 5
+
         while iteration < self.max_iterations:
             iteration += 1
 
-            self._trim_messages()
             log.info("chat.completions.create...")
             chat = await self.client.chat.completions.create(
                 model=config.get("model", "deepseek/deepseek-v3.2"),
-                messages=self.messages,
-                tools=all_tool_specs,
-                response_format={"type": "text"},
-                max_tokens=config.get("max_tokens", 16384)
+                messages=session_messages,
+                tools=all_tool_specs
             )
 
             if not chat.choices or len(chat.choices) == 0:
@@ -74,7 +73,7 @@ class BackgroundAgent(Agent):
                 finish_reason = None
 
             if assistant_message.tool_calls is not None:
-                self.messages.append(assistant_message)
+                session_messages.append(assistant_message)
 
                 llm_text = assistant_message.content.strip().rstrip(":").strip() if assistant_message.content else ""
 
@@ -95,29 +94,33 @@ class BackgroundAgent(Agent):
                         log.error(result)
 
                     
-                    self.messages.append({
+                    session_messages.append({
                             "role": "tool", 
                             "tool_call_id": tool_call.id, 
                             "name": tool_name, 
                             "content": result
                     })
 
-                    log.info(f"{result[:200]}...")
+                    log.info(f"{result[:250]}...")
 
             else:
                 if assistant_message.content is not None and assistant_message.content.strip() != "":
                     if self.mq:
                         await self.mq.outgoing_msg(OutgoingMessage(content=assistant_message.content.strip(), channel=self.channel, metadata=self._reply_metadata))
-                    
+                
                 if finish_reason == "stop":
-                    self.messages.append(assistant_message)
-                    if assistant_message.content:
-                        self.history.add_message("assistant", assistant_message.content.strip())
+                    session_messages.append(assistant_message)
                     break
-    
+            
             if self.channel.has_stopped:
                 log.info("Channel has been stopped, breaking out of agent loop.")
                 break
         
         self.channel.clear_stopped()
 
+        if len(session_messages) > 2 and assistant_message is not None:  # only add to history if there's something beyond the initial user message
+            self.messages.append({"role": "user", "content": message})
+            self.messages.append(session_messages[-1])
+            self.history.add_message("user", message)
+            assistant_content = assistant_message.content.strip() if assistant_message.content else ""
+            self.history.add_message("assistant", assistant_content)

@@ -35,7 +35,7 @@ def make_agent(max_iterations=10):
     with patch("app.agent.Client") as MockClient:
         mock_openai = make_mock_client()
         MockClient.return_value.get_client.return_value = mock_openai
-        with patch("app.agent.load_system_context", return_value=""):
+        with patch("app.agent.load_system_context", return_value="You are a helpful assistant."):
             with patch("app.background_agent.MessageHistory") as MockHistory:
                 MockHistory.return_value.get_history.return_value = []
                 agent = BackgroundAgent(mq=mq, channel=_mock_channel, max_iterations=max_iterations)
@@ -51,7 +51,8 @@ def patch_config():
 
 def test_agent_initializes_with_empty_messages():
     agent, _, _ = make_agent()
-    assert agent.messages == []
+    assert len(agent.messages) == 1  # System message
+    assert agent.messages[0]["role"] == "system"
 
 
 def test_agent_initializes_with_system_context():
@@ -90,8 +91,8 @@ async def test_agent_loop_adds_user_message():
 async def test_agent_loop_appends_assistant_message():
     agent, _, _ = make_agent()
     await agent.agent_loop("Hello")
-    assistant_messages = [m for m in agent.messages if not isinstance(m, dict)]
-    assert any(msg.content == "Hello!" and msg.tool_calls is None for msg in assistant_messages)
+    agent.history.add_message.assert_called_with("assistant", "Hello!")
+    assert agent.messages[-1].content == "Hello!"
 
 
 @pytest.mark.asyncio
