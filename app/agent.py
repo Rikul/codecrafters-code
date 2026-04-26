@@ -8,7 +8,7 @@ MAX_CONTEXT_MESSAGES = 100
 
 class Agent(ABC):
 
-    def __init__(self, max_iterations: int = 100) -> None:
+    def __init__(self, max_iterations: int = 250) -> None:
         self.client = Client().get_client()
         self.messages: list[dict] = []
         self.max_iterations = max_iterations
