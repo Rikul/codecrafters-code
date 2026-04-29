@@ -37,6 +37,7 @@ class BackgroundAgent(Agent):
 
     async def agent_loop(self, message: str, metadata: dict = None) -> None:
         self._trim_messages()
+        self.history.add_message("user", message)
 
         session_messages = self.messages[:] + [{"role": "user", "content": message}]
         self._reply_metadata = metadata or {}
@@ -118,9 +119,8 @@ class BackgroundAgent(Agent):
         
         self.channel.clear_stopped()
 
-        if len(session_messages) > 2 and assistant_message is not None:  # only add to history if there's something beyond the initial user message
+        if len(session_messages) >= 2 and assistant_message is not None:
             self.messages.append({"role": "user", "content": message})
             self.messages.append(session_messages[-1])
-            self.history.add_message("user", message)
             assistant_content = assistant_message.content.strip() if assistant_message.content else ""
             self.history.add_message("assistant", assistant_content)

@@ -21,6 +21,7 @@ class CliAgent(Agent):
 
     async def agent_loop(self, message: str,  metadata: dict = None) -> None:
         self._trim_messages()
+        self.history.add_message("user", message)
 
         session_messages = self.messages[:] + [{"role": "user", "content": message}]
         iteration = 0
@@ -89,8 +90,7 @@ class CliAgent(Agent):
                     session_messages.append(assistant_message)
                     break
         
-        if len(session_messages) > 2:  # only add to history if there's something beyond the initial user message and assistant response
+        if len(session_messages) >= 2:  # only add to history if there's something beyond the initial user message and assistant response
             self.messages.append({"role": "user", "content": message})
             self.messages.append(session_messages[-1]) 
-            self.history.add_message("user", message)
             self.history.add_message("assistant", assistant_message.content.strip() if assistant_message.content else "")
