@@ -8,7 +8,9 @@ from .tools.bash import BashTool
 from .tools.web_fetch import WebFetchTool
 from .tools.get_skills_dir import GetSkillsDirTool
 from .tools.todo import TodoAddTool, TodoListTool, TodoClearTool, TodoUpdateTool
+from .tools.calculator import CalculatorTool
 
+import json
 
 tool_registry = {
     "read_file": ReadFileTool,
@@ -20,6 +22,7 @@ tool_registry = {
     "todo_list": TodoListTool,
     "todo_update": TodoUpdateTool,
     "todo_clear": TodoClearTool,
+    "calculator": CalculatorTool
 }
 
 all_tool_specs = [tool.spec() for tool in tool_registry.values()]
@@ -39,3 +42,4 @@ def run_tool(tool_name: str, tool_args: dict) -> str:
         os.chdir(original_cwd)
     
     return trunc_str_with_ellipsis(MAX_TOOL_RESULT_LENGTH, result)
+    
