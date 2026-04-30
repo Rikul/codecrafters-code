@@ -1,9 +1,14 @@
 #!/bin/bash
 # Restart the background agent with the latest code.
-#
-# Run directly:        ./restart.sh
-# Run from agent bash tool (non-blocking):
-#   nohup ./restart.sh > /tmp/restart.log 2>&1 & echo "Restart initiated"
+# Safe to call from within the running bot — detaches itself before killing the old process.
+
+# Self-detach: re-exec in a new session so the kill below won't take us down
+if [ -z "$_RESTART_DETACHED" ]; then
+    _RESTART_DETACHED=1 nohup bash "$0" "$@" >> /tmp/restart.log 2>&1 &
+    disown $!
+    echo "[restart] Queued (PID $!). Logs: /tmp/restart.log"
+    exit 0
+fi
 
 set -e
 
