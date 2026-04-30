@@ -57,6 +57,8 @@ Code Reviews        -> code-reviews/
 - **todo_list**: List all tasks and their statuses
 - **todo_update**: Update a task's status (`task_id`, `status`: `todo` | `in_progress` | `done`)
 - **todo_clear**: Clear all todos when the work is complete
+- **calculator**: Provides add, subtract, multiply, divide, exponentiate, factorial, is_prime, square_root
+- **hackernews**: Hacker News stores from https://news.ycombinator.com/. Fetches the top stories from Hacker News
 
 ## Todo Tool Guidelines
 
