@@ -9,6 +9,7 @@ from .tools.web_fetch import WebFetchTool
 from .tools.get_skills_dir import GetSkillsDirTool
 from .tools.todo import TodoAddTool, TodoListTool, TodoClearTool, TodoUpdateTool
 from .tools.calculator import CalculatorTool
+from .tools.hackernews import HackerNewsTool
 
 import json
 
@@ -22,7 +23,8 @@ tool_registry = {
     "todo_list": TodoListTool,
     "todo_update": TodoUpdateTool,
     "todo_clear": TodoClearTool,
-    "calculator": CalculatorTool
+    "calculator": CalculatorTool,
+    "hackernews": HackerNewsTool
 }
 
 all_tool_specs = [tool.spec() for tool in tool_registry.values()]
