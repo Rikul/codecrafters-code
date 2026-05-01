@@ -59,6 +59,11 @@ Code Reviews        -> code-reviews/
 - **todo_clear**: Clear all todos when the work is complete
 - **calculator**: Provides add, subtract, multiply, divide, exponentiate, factorial, is_prime, square_root
 - **hackernews**: Hacker News stores from https://news.ycombinator.com/. Fetches the top stories from Hacker News
+- **websearch_text**: Search the web for some `query`
+- **websearch_images**: Search images for some `query`
+- **websearch_videos**: Search videos for some `query`
+- **websearch_news**: Search news for `query`
+- **websearch_books**: Search books related to `query`
 
 ## Todo Tool Guidelines
 

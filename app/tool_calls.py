@@ -11,6 +11,12 @@ from .tools.todo import TodoAddTool, TodoListTool, TodoClearTool, TodoUpdateTool
 from .tools.calculator import CalculatorTool
 from .tools.hackernews import HackerNewsTool
 
+from .tools.web_search import WebSearchText
+from .tools.web_search import WebSearchImages
+from .tools.web_search import WebSearchVideos
+from .tools.web_search import WebSearchNews
+from .tools.web_search import WebSearchBooks
+
 import json
 
 tool_registry = {
@@ -24,7 +30,12 @@ tool_registry = {
     "todo_update": TodoUpdateTool,
     "todo_clear": TodoClearTool,
     "calculator": CalculatorTool,
-    "hackernews": HackerNewsTool
+    "hackernews": HackerNewsTool,
+    "websearch_text": WebSearchText,
+    "websearch_images": WebSearchImages,
+    "websearch_videos": WebSearchVideos,
+    "websearch_news": WebSearchNews,
+    "websearch_books": WebSearchBooks
 }
 
 all_tool_specs = [tool.spec() for tool in tool_registry.values()]
@@ -43,5 +54,7 @@ def run_tool(tool_name: str, tool_args: dict) -> str:
     finally:
         os.chdir(original_cwd)
     
+    if not isinstance(result, str):
+        result = json.dumps(result)
     return trunc_str_with_ellipsis(MAX_TOOL_RESULT_LENGTH, result)
     
