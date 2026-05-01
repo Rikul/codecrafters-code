@@ -9,6 +9,7 @@ _config : dict = {}
 APP_NAME = "crafterscode"
 PROJECT_HOME = Path.home() / f".{APP_NAME}"
 HOME_CONFIG_PATH =  PROJECT_HOME / "config.toml"
+APP_DB = Path.home() / f".{APP_NAME}" / "app.db"
 
 def load(path: Path | str = HOME_CONFIG_PATH) -> None:
     global _config

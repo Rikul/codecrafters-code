@@ -4,17 +4,13 @@ import sqlite3
 from datetime import datetime
 from pathlib import Path
 from .app_logging import log
-from .config import APP_NAME
-
-HISTORY_DB = Path.home() / f".{APP_NAME}" / "history.db"
-
+from .config import APP_NAME, APP_DB
 
 def _est_tokens(content: str) -> int:
     return max(1, len(content) // 4)
 
-
 class MessageHistory:
-    def __init__(self, channel_type: str, db_path: Path = HISTORY_DB):
+    def __init__(self, channel_type: str, db_path: Path = APP_DB):
         self.db_path = db_path
         self.channel = channel_type
         self._ensure_db()
