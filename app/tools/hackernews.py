@@ -1,4 +1,3 @@
-import subprocess
 from ..app_logging import log
 from .tool import Tool
 
@@ -28,7 +27,7 @@ class HackerNewsTool(Tool):
 
     @staticmethod
     def call(number_of_stories  : int = 10) -> str:
-        log.info(f"hackernews")
+        log.info(f"hackernews: number_of_stories: {number_of_stories}")
 
         try:
 

@@ -1,4 +1,3 @@
-import subprocess
 from ..app_logging import log
 from .tool import Tool
 import math

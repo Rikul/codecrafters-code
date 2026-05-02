@@ -6,7 +6,7 @@ import json
 from . import config
 from .tool_calls import run_tool, all_tool_specs
 from .app_logging import log
-from .channel import Channel, ChannelType
+from .channel import Channel
 from .message import OutgoingMessage
 from .message_queue import MessageQueue
 from .agent import Agent, MAX_CONTEXT_MESSAGES
