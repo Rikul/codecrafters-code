@@ -34,4 +34,4 @@ def migrate_db_path():
     old = Path.home() / f".{APP_NAME}" / "history.db"
     if old.exists() and not APP_DB.exists():
         old.rename(APP_DB)
-        log.info(f"Migrated database: history.db → app.db")
+        log.info("Migrated database: history.db → app.db")

@@ -4,7 +4,6 @@ import logging
 from .message_queue import MessageQueue
 from .channel import Channel, ChannelType
 from .message import OutgoingMessage, IncomingMessage
-from .helpers import trunc_str_with_ellipsis
 
 from telegram import Update, constants
 from telegram.ext import (
