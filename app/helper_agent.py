@@ -3,7 +3,6 @@ from __future__ import annotations
 import json
 
 from . import config
-from .tool_calls import run_tool, all_tool_specs
 from .app_logging import log
 from .agent import Agent
 
@@ -23,6 +22,7 @@ class HelperAgent(Agent):
         return await self.agent_loop(prompt)
 
     async def agent_loop(self, message: str, metadata: dict = None) -> str:
+        from .tool_calls import helper_tool_specs, run_tool
         self.messages.append({"role": "user", "content": message})
         iteration = 0
         assistant_message = None
@@ -34,7 +34,7 @@ class HelperAgent(Agent):
             chat = await self.client.chat.completions.create(
                 model=config.get("model", "deepseek/deepseek-v3.2"),
                 messages=self.messages,
-                tools=all_tool_specs
+                tools=helper_tool_specs
             )
 
             if not chat.choices:
