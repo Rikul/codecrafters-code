@@ -64,20 +64,19 @@ Code Reviews        -> code-reviews/
 - **websearch_videos**: Search videos for some `query`
 - **websearch_news**: Search news for `query`
 - **websearch_books**: Search books related to `query`
-
-## Todo Tool Guidelines
+- **list_scheduled_tasks**: List all background scheduled tasks
+- **add_scheduled_task**: Add a new background scheduled task (`name`, `prompt`, `interval_minutes`)
+  - Example: `add_scheduled_task(name="morning-news", prompt="Fetch the top 5 HackerNews stories and summarize them", interval_minutes=60)`
+- **enable_scheduled_task**: Re-enable a previously disabled scheduled task (`name`)
+- **disable_scheduled_task**: Temporarily disable a scheduled task without removing it (`name`)
+- **remove_scheduled_task**: Permanently remove a scheduled task (`name`)
+- **get_scheduled_task_output**: Get recent output from a scheduled task (`name`, optional `num_entries`, default 5)
 
 **✅ Use Todo Tools For:**
 - **Long-running tasks** that span multiple steps
 - **Complex projects** where progress needs tracking
 - **Multi-phase work** with dependencies between steps
 - **Large refactoring** where you need to track what's been done
--
-**❌ Don't Use Todo Tools For:**
-- Simple one-off commands
-- Tasks that complete within a few tool calls
-- When working memory alone is sufficient
-- For tasks that should persist beyond the current session
 
 # Quality Checks
 - Validate tool outputs before using them

@@ -5,6 +5,7 @@ from . import config
 from .app_logging import log
 from .background_agent import BackgroundAgent
 from .message_queue import MessageQueue
+from .scheduled_tasks import ScheduledTasks
 
 
 async def start_server() -> None:
@@ -36,8 +37,11 @@ async def start_server() -> None:
     telegram_channel.start()
     telegram_agent = BackgroundAgent(mq=mq, channel=telegram_channel)
 
+    tasks = ScheduledTasks()
+
     await asyncio.gather(
         telegram_channel.run_polling(),
         telegram_agent.process_incoming(),
         mq.process_outgoing(),
+        tasks.run()
     )
