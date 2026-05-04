@@ -48,7 +48,8 @@ class TodoListTool(Tool):
             "type": "function",
             "function": {
                 "name": "todo_list",
-                "description": "List all tasks and their statuses"
+                "description": "List all tasks and their statuses",
+                "parameters": {"type": "object", "properties": {}}
             }
         }
 
@@ -75,7 +76,8 @@ class TodoClearTool(Tool):
             "type": "function",
             "function": {
                 "name": "todo_clear",
-                "description": "Todos are done, clear all todos"
+                "description": "Todos are done, clear all todos",
+                "parameters": {"type": "object", "properties": {}}
             }
         }
 

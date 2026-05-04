@@ -17,7 +17,7 @@ class HackerNewsTool(Tool):
                     "type": "object",
                     "properties": {
                         "number_of_stories": {
-                            "type": "int",
+                            "type": "integer",
                             "description": "The number of top stories to fetch (default is 10)"
                         }
                     }
