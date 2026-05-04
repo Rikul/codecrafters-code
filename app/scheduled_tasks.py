@@ -84,14 +84,14 @@ class ScheduledTasks:
 
 
     def add_task(self, name: str, prompt: str, next_run: str, interval_mins: int = 1,
-                 repeat: int = 0, delivery_channel: str = "telegram"):
+                 repeat: int = 0, delivery_channel: str = "telegram", enabled: int = 1):
         now = datetime.now().isoformat()
         with sqlite3.connect(APP_DB) as conn:
             try:
                 conn.execute("""
-                    INSERT INTO tasks (name, prompt, interval_mins, repeat, next_run, delivery_channel, created_at)
-                    VALUES (?, ?, ?, ?, ?, ?, ?)
-                """, (name, prompt, interval_mins, repeat, next_run or now, delivery_channel, now))
+                    INSERT INTO tasks (name, prompt, interval_mins, repeat, next_run, delivery_channel, enabled, created_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """, (name, prompt, interval_mins, repeat, next_run or now, delivery_channel, enabled, now))
                 conn.commit()
             except sqlite3.IntegrityError:
                 raise ValueError(f"Task '{name}' already exists")
