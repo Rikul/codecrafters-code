@@ -38,7 +38,6 @@ The project uses `uv` for dependency management. No compile step is needed.
 Config lives at `~/.crafterscode/config.toml` (created automatically on first run with defaults). Key fields:
 - `model` — LLM model string (default: `"deepseek/deepseek-v3.2"`)
 - `max_iterations` — max agentic loop iterations (default: `100`)
-- `max_tokens` — max tokens per LLM call (default: `32768`)
 - `base_url` — API base URL (default: `"https://openrouter.ai/api/v1"`)
 
 Environment variables: `LLM_API_KEY` (required), `LLM_BASE_URL` (optional override).
@@ -59,7 +58,9 @@ The difference: `CliAgent` prints to stdout and prompts stdin for permission; `B
 
 Tools are registered in `app/tool_calls.py` in `tool_registry` — a dict mapping tool name → `{spec, func}`. Each tool in `app/tools/` exports a function and an OpenAI-format tool spec dict. `run_tool()` dispatches by name and restores `os.getcwd()` after each call.
 
-Current tools: `read_file`, `write_file`, `bash`, `web_fetch`, `get_skills_dir`, `todo_add/list/update/clear`.
+Current tools: `read_file`, `write_file`, `bash`, `web_fetch`, `get_skills_dir`, `todo_add/list/update/clear`, `calculator`, `hackernews`, `websearch_text/images/videos/news/books`, `list/add/update/remove_scheduled_task`, `get_scheduled_task_output`.
+
+`_HELPER_AGENT_TOOLS` in `tool_calls.py` is an explicit allowlist of tools available to `HelperAgent` (used internally by scheduled tasks). Scheduled task management tools are excluded to prevent recursion.
 
 ### System Context
 
@@ -68,6 +69,12 @@ On startup, `load_system_context()` (`app/helpers.py`) loads `app/sys_instructio
 ### Message Queue / Channel Architecture
 
 `MessageQueue` (`app/message_queue.py`) holds two `asyncio.Queue`s (incoming/outgoing). Delivery functions are registered per `Channel` enum value. `BackgroundAgent.process_incoming()` consumes the incoming queue and drives `agent_loop()`; `process_outgoing()` dispatches outbound messages to registered delivery functions. This is the intended extension point for adding new channels.
+
+Each channel should have its own `MessageQueue` instance to avoid cross-channel message routing bugs (e.g., a Telegram message being handled by the Discord agent).
+
+### Scheduled Tasks
+
+`ScheduledTasks` (`app/scheduled_tasks.py`) is a SQLite-backed task runner using the shared `APP_DB` (`~/.crafterscode/app.db`). It polls every 60 seconds, checks `next_run`, and executes due tasks via `HelperAgent`. Results are delivered to the configured channel via `MessageQueue`. Schema: `tasks` (id, name, prompt, enabled, repeat, interval_mins, next_run, last_run, delivery_channel, run_count, created_at) and `task_outputs` (id, name, prompt, output, status, duration_secs, timestamp). The `run()` coroutine is added to the `asyncio.gather` in `bg_server.py`.
 
 ## Testing Approach
 

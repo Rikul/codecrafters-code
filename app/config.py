@@ -34,7 +34,6 @@ def get_default_config() -> dict:
     default_config = """\
 model = "deepseek/deepseek-v3.2"
 max_iterations = 100
-max_tokens = 32768
 base_url = "https://openrouter.ai/api/v1"
 
 [telegram]
