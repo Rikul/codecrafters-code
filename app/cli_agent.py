@@ -46,7 +46,7 @@ class CliAgent(Agent):
                 finish_reason = None
 
             if assistant_message.tool_calls is not None:
-                session_messages.append(assistant_message)
+                session_messages.append(self._serialize_assistant_msg(assistant_message))
 
                 if not self.silent and assistant_message.content is not None and assistant_message.content.strip() != "":
                     print(assistant_message.content.strip())
@@ -87,7 +87,7 @@ class CliAgent(Agent):
                     print(assistant_message.content)
 
                 if finish_reason == "stop":
-                    session_messages.append(assistant_message)
+                    session_messages.append(self._serialize_assistant_msg(assistant_message))
                     break
         
         if len(session_messages) >= 2:  # only add to history if there's something beyond the initial user message and assistant response

@@ -74,7 +74,7 @@ class BackgroundAgent(Agent):
                 finish_reason = None
 
             if assistant_message.tool_calls is not None:
-                session_messages.append(assistant_message)
+                session_messages.append(self._serialize_assistant_msg(assistant_message))
 
                 llm_text = assistant_message.content.strip().rstrip(":").strip() if assistant_message.content else ""
 
@@ -110,7 +110,7 @@ class BackgroundAgent(Agent):
                         await self.mq.outgoing_msg(OutgoingMessage(content=assistant_message.content.strip(), channel=self.channel, metadata=self._reply_metadata))
                 
                 if finish_reason == "stop":
-                    session_messages.append(assistant_message)
+                    session_messages.append(self._serialize_assistant_msg(assistant_message))
                     break
             
             if self.channel.has_stopped:
