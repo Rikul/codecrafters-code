@@ -17,8 +17,8 @@ from .tools.web_search import WebSearchVideos
 from .tools.web_search import WebSearchNews
 from .tools.web_search import WebSearchBooks
 
-from .tools.sched_tasks_tool import ListScheduledTasks, AddScheduledTask, DisableScheduledTask, \
-                        RemoveScheduledTask, GetScheduledTaskOutput, EnableScheduledTask
+from .tools.sched_tasks_tool import ListScheduledTasks, AddScheduledTask, UpdateScheduledTask, \
+                        RemoveScheduledTask, GetScheduledTaskOutput
 
 import json
 
@@ -45,17 +45,16 @@ tool_registry = {
 
     "list_scheduled_tasks": ListScheduledTasks,
     "add_scheduled_task": AddScheduledTask,
-    "disable_scheduled_task": DisableScheduledTask,
-    "enable_scheduled_task": EnableScheduledTask,
+    "update_scheduled_task": UpdateScheduledTask,
     "remove_scheduled_task": RemoveScheduledTask,
     "get_scheduled_task_output": GetScheduledTaskOutput
 }
 
 all_tool_specs = [tool.spec() for tool in tool_registry.values()]
 
-_SCHED_TOOLS = {"list_scheduled_tasks", "add_scheduled_task", "enable_scheduled_task",
-                "disable_scheduled_task", "remove_scheduled_task", "get_scheduled_task_output"}
-helper_tool_specs = [tool.spec() for k, tool in tool_registry.items() if k not in _SCHED_TOOLS]
+_HELPER_AGENT_TOOLS = {"read_file", "write_file", "bash", "web_fetch", "get_skills_dir", "calculator", "hackernews",
+                        "websearch_text", "websearch_images", "websearch_videos", "websearch_news", "websearch_books"}
+helper_tool_specs = [tool.spec() for k, tool in tool_registry.items() if k in _HELPER_AGENT_TOOLS]
 
 MAX_TOOL_RESULT_LENGTH = 16000
 

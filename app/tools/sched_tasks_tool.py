@@ -59,21 +59,21 @@ class AddScheduledTask(Tool):
                         },
                         "next_run": {
                             "type": "string",
-                            "description": "ISO 8601 datetime for the first run (e.g. '2026-05-03T09:00:00'). Defaults to now."
+                            "description": "ISO 8601 datetime for the first run (e.g. '2026-05-03T09:00:00') in local time."
                         },
                         "delivery_channel": {
                             "type": "string",
                             "description": "Channel to deliver the task output to. Defaults to 'telegram'."
                         }
                     },
-                    "required": ["name", "prompt", "interval_minutes"]
+                    "required": ["name", "prompt", "next_run", "interval_minutes"]
                 }
             }
         }
 
     @staticmethod
-    def call(name: str, prompt: str, interval_minutes: int,
-             repeat: bool = False, next_run: str = None, delivery_channel: str = "telegram") -> str:
+    def call(name: str, prompt: str, interval_minutes: int, next_run: str,
+             repeat: bool = False,  delivery_channel: str = "telegram") -> str:
         log.info("add_scheduled_task called")
 
         ScheduledTasks().add_task(name=name, prompt=prompt, interval_mins=interval_minutes,
@@ -111,23 +111,42 @@ class RemoveScheduledTask(Tool):
         ScheduledTasks().remove_task(name)
 
         return f"Removed scheduled task '{name}'"
-    
 
-class DisableScheduledTask(Tool):
+class UpdateScheduledTask(Tool):
     
     @staticmethod
     def spec():
         return {
             "type": "function",
             "function": {
-                "name": "disable_scheduled_task",
-                "description": "Disable a background scheduled task so that it will temporarily stop being executed by the background agent without being removed",
+                "name": "update_scheduled_task",
+                "description": "Update an existing background scheduled task. Only the fields provided in the parameters will be updated.",
                 "parameters": {
                     "type": "object",
                     "properties": {
                         "name": {
                             "type": "string",
-                            "description": "The name of the scheduled task to deactivate"
+                            "description": "The name of the scheduled task to update"
+                        },
+                        "prompt": {
+                            "type": "string",
+                            "description": "The new prompt for the scheduled task"
+                        },
+                        "interval_minutes": {
+                            "type": "integer",
+                            "description": "The new interval in minutes between executions (only used when repeat=true)"
+                        },
+                        "repeat": {
+                            "type": "boolean",
+                            "description": "Whether to repeat the task at the given interval. False means run once."
+                        },
+                        "next_run": {
+                            "type": "string",
+                            "description": "ISO 8601 datetime for the next run (e.g. '2026-05-03T09:00:00') in local time."
+                        },
+                        "delivery_channel": {
+                            "type": "string",
+                            "description": "Channel to deliver the task output to."
                         }
                     },
                     "required": ["name"]
@@ -136,44 +155,35 @@ class DisableScheduledTask(Tool):
         }
 
     @staticmethod
-    def call(name: str) -> str:
-        log.info("disable_scheduled_task called")
-      
-        ScheduledTasks().disable_task(name)
+    def call(name: str, prompt: str = None, interval_minutes: int = None, next_run: str = None,
+             repeat: bool = None, delivery_channel: str = None) -> str:
+        log.info("update_scheduled_task called")
 
-        return f"Disabled scheduled task '{name}'"
-    
+        tasks = ScheduledTasks().load_tasks()
+        task = next((t for t in tasks if t["name"] == name), None)
+        if not task:
+            return f"Scheduled task '{name}' not found"
 
-class EnableScheduledTask(Tool):
-    
-    @staticmethod
-    def spec():
-        return {
-            "type": "function",
-            "function": {
-                "name": "enable_scheduled_task",
-                "description": "Enable a background scheduled task that was previously disabled so that it will resume being executed by the background agent",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "name": {
-                            "type": "string",
-                            "description": "The name of the scheduled task to enable"
-                        }
-                    },
-                    "required": ["name"]
-                }
-            }
-        }
+        updated_fields = {}
+        if prompt is not None:
+            updated_fields["prompt"] = prompt
+        if interval_minutes is not None:
+            updated_fields["interval_mins"] = interval_minutes
+        if next_run is not None:
+            updated_fields["next_run"] = next_run
+        if repeat is not None:
+            updated_fields["repeat"] = int(repeat)
+        if delivery_channel is not None:
+            updated_fields["delivery_channel"] = delivery_channel
 
-    @staticmethod
-    def call(name: str) -> str:
-        log.info("enable_scheduled_task called")
-      
-        ScheduledTasks().enable_task(name)  
+        if not updated_fields:
+            return f"No fields to update for task '{name}'"
 
-        return f"Enabled scheduled task '{name}'"
-    
+        ScheduledTasks().update_task(name, **updated_fields)
+        changed = ", ".join(updated_fields.keys())
+        return f"Updated scheduled task '{name}': {changed}"
+
+
 class GetScheduledTaskOutput(Tool):
     
     @staticmethod

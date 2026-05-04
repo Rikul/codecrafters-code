@@ -53,10 +53,9 @@
 - **add_scheduled_task**: Add a new background scheduled task (`name`, `prompt`, `interval_minutes`, optional `repeat`, `next_run`, `delivery_channel`)
   - Example (repeat every hour): `add_scheduled_task(name="morning-news", prompt="Fetch the top 5 HackerNews stories and summarize them", interval_minutes=60, repeat=true, delivery_channel="telegram")`
   - Example (run once at a specific time): `add_scheduled_task(name="reminder", prompt="Remind the user to take a break", interval_minutes=0, repeat=false, next_run="2026-05-04T15:00:00")`
-- **enable_scheduled_task**: Re-enable a previously disabled scheduled task (`name`)
-  - Example: `enable_scheduled_task(name="morning-news")`
-- **disable_scheduled_task**: Temporarily disable a scheduled task without removing it (`name`)
-  - Example: `disable_scheduled_task(name="morning-news")`
+- **update_scheduled_task**: Update any fields of an existing scheduled task (`name`, optional `prompt`, `interval_minutes`, `repeat`, `next_run`, `delivery_channel`). Also use this to enable/disable a task by setting `enabled`.
+  - Example (reschedule): `update_scheduled_task(name="morning-news", next_run="2026-05-05T09:00:00")`
+  - Example (change interval): `update_scheduled_task(name="morning-news", interval_minutes=120, repeat=true)`
 - **remove_scheduled_task**: Permanently remove a scheduled task (`name`)
 - **get_scheduled_task_output**: Get recent output from a scheduled task (`name`, optional `num_entries`, default 5)
   - Example: `get_scheduled_task_output(name="morning-news", num_entries=3)`
