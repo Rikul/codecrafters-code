@@ -14,9 +14,10 @@ Read your instructions and execute them. Be concise.
 """
 
 class ScheduledTasks:
-    def __init__(self, mq=None, channels: dict = None):
+    def __init__(self, mq=None, channels: dict = None, default_metadata: dict = None):
         self._mq = mq
         self._channels = channels or {}
+        self._default_metadata = default_metadata or {}
         self._init_tasks_db()
 
     def _migrate(self, conn, table: str, columns: list[tuple[str, str]]):
@@ -166,7 +167,7 @@ class ScheduledTasks:
             channel = self._channels.get(task["delivery_channel"])
             if channel:
                 from .message import OutgoingMessage
-                await self._mq.outgoing_msg(OutgoingMessage(content=output, channel=channel))
+                await self._mq.outgoing_msg(OutgoingMessage(content=output, channel=channel, metadata=self._default_metadata))
             else:
                 log.warning(f"Delivery channel '{task['delivery_channel']}' not found for task '{name}'")
 

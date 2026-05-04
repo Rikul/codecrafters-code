@@ -38,7 +38,9 @@ async def start_server() -> None:
     telegram_agent = BackgroundAgent(mq=mq, channel=telegram_channel)
 
     channels = {"telegram": telegram_channel} if telegram_channel else {}
-    tasks = ScheduledTasks(mq=mq, channels=channels)
+    allow_from = config.telegram.get("ALLOW_FROM", []) if config.get("telegram") else []
+    default_metadata = {"chat_id": allow_from[0]} if allow_from else {}
+    tasks = ScheduledTasks(mq=mq, channels=channels, default_metadata=default_metadata)
 
     await asyncio.gather(
         telegram_channel.run_polling(),
