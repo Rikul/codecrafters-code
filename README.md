@@ -1,16 +1,14 @@
-A CodeCrafters challenge project implementing an AI agent with tool calling capabilities, built for the ["Build Your own Claude Code" Challenge](https://codecrafters.io/challenges/claude-code).
-
 ## Overview
 
-An AI agent that can parse and execute user prompts, interact with the file system, run shell commands, fetch web content, and track tasks. Built using the OpenRouter API (defaulting to DeepSeek) via the OpenAI Python client.
+A Python-based AI agent that can execute prompts, interact with the filesystem, run shell commands, fetch web content, search the web, and manage scheduled tasks. Built on the OpenAI SDK against OpenRouter (defaulting to DeepSeek).
 
-- **Interactive CLI**: REPL mode for multi-turn agent sessions
-- **Tool Calling**: File operations, shell commands, web fetching, and task tracking
-- **Skills System**: Skills located in `app/skills/` directory (e.g., `puppeteer`)
-- **Background Agent**: Message queue and channel architecture for multi-channel delivery (Telegram, Discord, etc.)
-- **Telegram Integration**: Built-in Telegram bot channel (`app/telegram_channel.py`) for receiving and sending messages
-- **Persistent Message History**: SQLite-backed history at `~/.crafterscode/history.db`, stored per channel with token estimates
-- **Context Window Trimming**: Automatically trims conversation history to the last 100 messages (preserving the system message) to stay within model context limits
+- **Interactive CLI**: Multi-turn REPL sessions with tool use
+- **Background Agent**: Runs as a persistent bot, receiving and sending messages via channels
+- **Telegram Integration**: Built-in Telegram bot — receive messages, respond, run tools, deliver results
+- **Scheduled Tasks**: SQLite-backed task scheduler — run prompts on a recurring or one-shot schedule and deliver results to a channel
+- **Tool Calling**: File I/O, shell commands, web fetch, web search (text/images/video/news/books), calculator, Hacker News, todo list
+- **Skills System**: Extendable skills in `app/skills/` (e.g., `puppeteer` for headless browsing)
+- **Persistent History**: Per-channel SQLite message history at `~/.crafterscode/app.db` (shared with scheduled tasks)
 
 
 ## Prerequisites
@@ -43,7 +41,6 @@ Config lives at `~/.crafterscode/config.toml` and is created automatically on fi
 ```toml
 model = "deepseek/deepseek-v3.2"
 max_iterations = 100
-max_tokens = 32768
 base_url = "https://openrouter.ai/api/v1"
 api_key = ""  # fallback if LLM_API_KEY env var is not set
 
@@ -80,43 +77,50 @@ Message history is stored in `~/.crafterscode/history.db` (SQLite). Each channel
 ./run.sh cli -p "Summarize this repo" -s
 ```
 
-### Background Agent with Telegram
+### Background Agent (Telegram bot)
 
-To run the agent as a Telegram bot, set your `BOT_TOKEN` and optionally restrict access by Telegram user ID in `~/.crafterscode/config.toml`:
+Set your `BOT_TOKEN` in `~/.crafterscode/config.toml` and optionally restrict access by Telegram user ID:
 
 ```toml
 [telegram]
 BOT_TOKEN = "123456:ABC-your-bot-token"
-ALLOW_FROM = [123456789]  # Telegram user IDs allowed to interact.
+ALLOW_FROM = [123456789]
 ```
-
-Then start the background agent:
 
 ```bash
 ./run.sh background
 ```
 
-The agent will listen for messages on Telegram and respond via the bot. Responses are routed back to the same chat that sent the message.
+The agent listens for Telegram messages, runs the agentic loop (including tool calls), and replies in the same chat.
 
-**Built-in Telegram commands:** `/help` — list available commands; `/whoami` — show your Telegram user ID (useful for configuring `ALLOW_FROM`).
+**Built-in commands:** `/help` — list commands; `/whoami` — show your Telegram user ID.
+
+### Scheduled Tasks
+
+The background agent supports scheduled prompts that run automatically and deliver results to a channel. Manage them by messaging the bot:
+
+```
+add a task to fetch HN top stories every 60 minutes starting now
+run "summarize the latest news" once at 2025-06-01T09:00:00
+list my scheduled tasks
+remove the HN task
+```
+
+Tasks persist in `~/.crafterscode/app.db` (shared with message history) and survive restarts.
 
 ## Roadmap
 
-- **Context Usage Tracking**: Enhanced monitoring of token consumption, cost estimation, and usage analytics per channel/model
-- **Intelligent Context Trimming/Compaction**: Advanced context management with summarization, selective trimming, and priority-based message retention
+- **Email Support**: IMAP/SMTP integration for reading and sending emails, attachment handling, and mailbox management
 - **MCP Support**: Integration with Model Context Protocol for external data sources, tools, and state management
 - **Discord Integration**: Discord bot with slash commands, rich embeds, and channel permissions
 - **Slack Integration**: Slack app with interactive messages, modals, and workspace management
 - **WhatsApp Support**: WhatsApp Business API integration via providers like Twilio or MessageBird
-- **Email Support**: IMAP/SMTP integration for reading and sending emails, attachment handling, and mailbox management
 - **Anthropic OAuth**: Direct integration with Claude API using OAuth 2.0
 - **Codex OAuth**: OpenAI Codex API authentication
 - **GitHub OAuth**: Access to repositories, issues, and GitHub Actions
 - **Gemini OAuth**: Google Gemini API authentication with Google Cloud credentials
-- **Expanded Tool Library**: More file operations, system monitoring, database interactions, and cloud services
 - **Useful Skills**: Advanced skills for web scraping (headless browsers), data analysis (Pandas, NumPy), document processing (PDF, DOCX), and media manipulation
 - **Web Dashboard**: Admin interface for monitoring agents, configuring channels, and viewing analytics
-- **API Server**: REST/WebSocket API for programmatic access to agent capabilities
 
 ## Testing
 
@@ -166,7 +170,3 @@ class MyTool(Tool):
     def call(param: str) -> str:
         return "result"
 ```
-
-## License
-
-Part of the CodeCrafters "Build Your own Claude Code" Challenge. See [codecrafters.io](https://codecrafters.io) for details.
