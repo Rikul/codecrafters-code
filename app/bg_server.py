@@ -37,7 +37,8 @@ async def start_server() -> None:
     telegram_channel.start()
     telegram_agent = BackgroundAgent(mq=mq, channel=telegram_channel)
 
-    tasks = ScheduledTasks()
+    channels = {"telegram": telegram_channel} if telegram_channel else {}
+    tasks = ScheduledTasks(mq=mq, channels=channels)
 
     await asyncio.gather(
         telegram_channel.run_polling(),

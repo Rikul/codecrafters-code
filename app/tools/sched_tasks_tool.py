@@ -51,7 +51,19 @@ class AddScheduledTask(Tool):
                         },
                         "interval_minutes": {
                             "type": "integer",
-                            "description": "The interval in minutes at which the background agent will execute the prompt"
+                            "description": "The interval in minutes between executions (only used when repeat=true)"
+                        },
+                        "repeat": {
+                            "type": "boolean",
+                            "description": "Whether to repeat the task at the given interval. False means run once. Defaults to false."
+                        },
+                        "next_run": {
+                            "type": "string",
+                            "description": "ISO 8601 datetime for the first run (e.g. '2026-05-03T09:00:00'). Defaults to now."
+                        },
+                        "delivery_channel": {
+                            "type": "string",
+                            "description": "Channel to deliver the task output to. Defaults to 'telegram'."
                         }
                     },
                     "required": ["name", "prompt", "interval_minutes"]
@@ -60,13 +72,15 @@ class AddScheduledTask(Tool):
         }
 
     @staticmethod
-    def call(name: str, prompt: str, interval_minutes: int) -> str:
+    def call(name: str, prompt: str, interval_minutes: int,
+             repeat: bool = False, next_run: str = None, delivery_channel: str = "telegram") -> str:
         log.info("add_scheduled_task called")
-      
-        tasks = ScheduledTasks()
-        tasks.add_task(name=name, prompt=prompt, interval_mins=interval_minutes)
 
-        return f"Added scheduled task '{name}' with interval {interval_minutes} minutes"
+        ScheduledTasks().add_task(name=name, prompt=prompt, interval_mins=interval_minutes,
+                                  repeat=int(repeat), next_run=next_run, delivery_channel=delivery_channel)
+
+        suffix = f" every {interval_minutes} minutes" if repeat else " (runs once)"
+        return f"Added scheduled task '{name}'{suffix}"
     
 class RemoveScheduledTask(Tool):
     
