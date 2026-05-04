@@ -10,7 +10,11 @@ class GetSkillsDirTool(Tool):
             "type": "function",
             "function": {
                 "name": "get_skills_dir",
-                "description": "Get the path to the skills directory"
+                "description": "Get the path to the skills directory",
+                "parameters": {
+                    "type": "object",
+                    "properties": {}
+                }
             }
         }
 

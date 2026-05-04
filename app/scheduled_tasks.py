@@ -83,8 +83,8 @@ class ScheduledTasks:
                 for n, p, e, rpt, i, lr, nr, dc, rc, c in rows]
 
 
-    def add_task(self, name: str, prompt: str, interval_mins: int = 1,
-                 repeat: int = 0, next_run: str = None, delivery_channel: str = "telegram"):
+    def add_task(self, name: str, prompt: str, next_run: str, interval_mins: int = 1,
+                 repeat: int = 0, delivery_channel: str = "telegram"):
         now = datetime.now().isoformat()
         with sqlite3.connect(APP_DB) as conn:
             try:
@@ -101,15 +101,18 @@ class ScheduledTasks:
             conn.execute("DELETE FROM tasks WHERE name = ?", (name,))
             conn.commit()
 
-    def enable_task(self, name: str):
+    def update_task(self, name: str, **fields):
+        if not fields:
+            return
+        set_clause = ", ".join(f"{col} = ?" for col in fields)
+        values = list(fields.values()) + [name]
         with sqlite3.connect(APP_DB) as conn:
-            conn.execute("UPDATE tasks SET enabled = 1 WHERE name = ?", (name,))
+            if not conn.execute("SELECT name FROM tasks WHERE name = ?", (name,)).fetchone():
+                raise ValueError(f"Task '{name}' not found")
+            conn.execute(f"UPDATE tasks SET {set_clause} WHERE name = ?", values)
             conn.commit()
 
-    def disable_task(self, name: str):
-        with sqlite3.connect(APP_DB) as conn:
-            conn.execute("UPDATE tasks SET enabled = 0 WHERE name = ?", (name,))
-            conn.commit()
+
 
     def save_output(self, name: str, prompt: str, output: str,
                     status: str = "success", duration_secs: float = None):
