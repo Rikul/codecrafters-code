@@ -69,7 +69,7 @@ async def test_agent_loop_adds_user_message():
 async def test_agent_loop_appends_assistant_message():
     agent, mock_client = make_agent()
     await agent.agent_loop("Hello")
-    assert agent.messages[-1].content == "Hello!"
+    assert agent.messages[-1]["content"] == "Hello!"
 
 
 @pytest.mark.asyncio

@@ -92,7 +92,7 @@ async def test_agent_loop_appends_assistant_message():
     agent, _, _ = make_agent()
     await agent.agent_loop("Hello")
     agent.history.add_message.assert_called_with("assistant", "Hello!")
-    assert agent.messages[-1].content == "Hello!"
+    assert agent.messages[-1]["content"] == "Hello!"
 
 
 @pytest.mark.asyncio
