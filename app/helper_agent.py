@@ -47,7 +47,7 @@ class HelperAgent(Agent):
                 finish_reason = None
 
             if assistant_message.tool_calls is not None:
-                self.messages.append(assistant_message)
+                self.messages.append(self._serialize_assistant_msg(assistant_message))
 
                 for tool_call in assistant_message.tool_calls:
                     try:

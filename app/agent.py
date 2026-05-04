@@ -29,6 +29,16 @@ class Agent(ABC):
         if len(rest) > MAX_CONTEXT_MESSAGES:
             self.messages = system + rest[-MAX_CONTEXT_MESSAGES:]
 
+    @staticmethod
+    def _serialize_assistant_msg(msg) -> dict:
+        d = {"role": msg.role, "content": msg.content}
+        if msg.tool_calls:
+            d["tool_calls"] = [tc.model_dump() for tc in msg.tool_calls]
+        reasoning = getattr(msg, "reasoning_content", None) or getattr(msg, "reasoning", None)
+        if reasoning is not None:
+            d["reasoning_content"] = reasoning
+        return d
+
     @abstractmethod
     async def agent_loop(self, message: str, metadata: dict = None) -> None:
         pass
