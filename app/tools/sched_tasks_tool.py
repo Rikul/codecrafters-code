@@ -64,6 +64,10 @@ class AddScheduledTask(Tool):
                         "delivery_channel": {
                             "type": "string",
                             "description": "Channel to deliver the task output to. Defaults to 'telegram'."
+                        },
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Whether the task is enabled. Defaults to true."
                         }
                     },
                     "required": ["name", "prompt", "next_run", "interval_minutes"]
@@ -73,11 +77,12 @@ class AddScheduledTask(Tool):
 
     @staticmethod
     def call(name: str, prompt: str, interval_minutes: int, next_run: str,
-             repeat: bool = False,  delivery_channel: str = "telegram") -> str:
+             repeat: bool = False, delivery_channel: str = "telegram", enabled: bool = True) -> str:
         log.info("add_scheduled_task called")
 
         ScheduledTasks().add_task(name=name, prompt=prompt, interval_mins=interval_minutes,
-                                  repeat=int(repeat), next_run=next_run, delivery_channel=delivery_channel)
+                                  repeat=int(repeat), next_run=next_run, delivery_channel=delivery_channel,
+                                  enabled=int(enabled))
 
         suffix = f" every {interval_minutes} minutes" if repeat else " (runs once)"
         return f"Added scheduled task '{name}'{suffix}"
@@ -147,6 +152,10 @@ class UpdateScheduledTask(Tool):
                         "delivery_channel": {
                             "type": "string",
                             "description": "Channel to deliver the task output to."
+                        },
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Enable or disable the task."
                         }
                     },
                     "required": ["name"]
@@ -156,7 +165,7 @@ class UpdateScheduledTask(Tool):
 
     @staticmethod
     def call(name: str, prompt: str = None, interval_minutes: int = None, next_run: str = None,
-             repeat: bool = None, delivery_channel: str = None) -> str:
+             repeat: bool = None, delivery_channel: str = None, enabled: bool = None) -> str:
         log.info("update_scheduled_task called")
 
         tasks = ScheduledTasks().load_tasks()
@@ -175,6 +184,8 @@ class UpdateScheduledTask(Tool):
             updated_fields["repeat"] = int(repeat)
         if delivery_channel is not None:
             updated_fields["delivery_channel"] = delivery_channel
+        if enabled is not None:
+            updated_fields["enabled"] = int(enabled)
 
         if not updated_fields:
             return f"No fields to update for task '{name}'"
