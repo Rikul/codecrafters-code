@@ -34,9 +34,10 @@ class Agent(ABC):
         d = {"role": msg.role, "content": msg.content}
         if msg.tool_calls:
             d["tool_calls"] = [tc.model_dump() for tc in msg.tool_calls]
-        reasoning = getattr(msg, "reasoning_content", None) or getattr(msg, "reasoning", None)
-        if reasoning is not None:
-            d["reasoning_content"] = reasoning
+            raw = msg.model_dump()
+            reasoning = raw.get("reasoning_content") or raw.get("reasoning")
+            if reasoning:
+                d["reasoning_content"] = reasoning
         return d
 
     @abstractmethod
