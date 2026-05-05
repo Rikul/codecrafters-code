@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta
-from .app_logging import log
-from .config import APP_DB
+from ..infra.app_logging import log
+from ..config import APP_DB
 import sqlite3
 import asyncio
 from .helper_agent import HelperAgent

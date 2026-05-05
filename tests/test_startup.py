@@ -1,7 +1,7 @@
 import pathlib
 from unittest.mock import patch
 
-from app.startup import load_system_context
+from app.infra.startup import load_system_context
 
 def test_load_system_context_returns_string():
     result = load_system_context()
@@ -18,7 +18,7 @@ def test_load_system_context_skips_missing_files(tmp_path):
     system_md_dir = tmp_path / "system.md"
     system_md_dir.mkdir()
 
-    with patch("app.startup.Path") as MockPath:
+    with patch("app.infra.startup.Path") as MockPath:
         instance = MockPath.return_value
         instance.parent.__truediv__ = lambda self, key: system_md_dir
         MockPath.side_effect = lambda *args, **kwargs: pathlib.Path(*args, **kwargs)

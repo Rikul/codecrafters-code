@@ -4,7 +4,7 @@ import sqlite3
 from datetime import datetime
 from pathlib import Path
 from .app_logging import log
-from .config import APP_DB
+from ..config import APP_DB
 
 def _est_tokens(content: str) -> int:
     return max(1, len(content) // 4)

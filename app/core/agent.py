@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 from .client import Client
-from .startup import load_system_context
+from ..infra.startup import load_system_context
 
 MAX_CONTEXT_MESSAGES = 100
 

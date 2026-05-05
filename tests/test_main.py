@@ -2,7 +2,7 @@ import logging
 import pytest
 from unittest.mock import patch, MagicMock, AsyncMock
 
-from app.cli import input_loop
+from app.cli.cli import input_loop
 from app.main import main
 
 
@@ -149,7 +149,7 @@ async def test_main_silent_sets_log_level_to_warning():
         for p in patches:
             p.stop()
 
-    from app.app_logging import log
+    from app.infra.app_logging import log
     assert log.level == logging.WARNING
 
 

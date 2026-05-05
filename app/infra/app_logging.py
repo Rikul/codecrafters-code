@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import logging.handlers
 from pathlib import Path
-from .config import APP_NAME
+from ..config import APP_NAME
 from .term_display import ANSI
 
 LOG_DIR = Path.home() / f".{APP_NAME}" / "logs"

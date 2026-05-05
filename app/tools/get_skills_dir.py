@@ -1,6 +1,6 @@
-from ..app_logging import log
+from ..infra.app_logging import log
 import pathlib
-from .tool import Tool
+from ..core.tool import Tool
 
 class GetSkillsDirTool(Tool):
 

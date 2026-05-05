@@ -3,7 +3,7 @@ import os
 import platform
 from datetime import datetime
 from .app_logging import log
-from . import config
+from .. import config
 
 def load_system_context() -> str:
     """
@@ -11,7 +11,7 @@ def load_system_context() -> str:
     """
 
     now = datetime.now()
-    sys_instructions_path = Path(__file__).parent / "sys_instructions.md"
+    sys_instructions_path = Path(__file__).parent.parent / "core" / "sys_instructions.md"
     system_context = ""
 
     try:

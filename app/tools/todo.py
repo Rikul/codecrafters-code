@@ -1,5 +1,5 @@
-from ..app_logging import log
-from .tool import Tool
+from ..infra.app_logging import log
+from ..core.tool import Tool
 
 _tasks: dict[str, dict] = {}
 _next_id = 1

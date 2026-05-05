@@ -3,15 +3,15 @@ from __future__ import annotations
 import asyncio
 import json
 
-from . import config
+from .. import config
 from .tool_calls import run_tool, all_tool_specs
-from .app_logging import log
-from .channel import Channel
-from .message import OutgoingMessage
-from .message_queue import MessageQueue
+from ..infra.app_logging import log
+from ..channels.channel import Channel
+from ..channels.message import OutgoingMessage
+from ..channels.message_queue import MessageQueue
 from .agent import Agent, MAX_CONTEXT_MESSAGES
 
-from .message_history import MessageHistory
+from ..infra.message_history import MessageHistory
 
 class BackgroundAgent(Agent):
 

@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import json
 
-from . import config
-from .tool_calls import run_tool, all_tool_specs
-from .app_logging import log
+from .. import config
+from ..core.tool_calls import run_tool, all_tool_specs
+from ..infra.app_logging import log
 from .cli import ask_permission
-from .agent import Agent, MAX_CONTEXT_MESSAGES
-from .message_history import MessageHistory
-from .channel import ChannelType
+from ..core.agent import Agent, MAX_CONTEXT_MESSAGES
+from ..infra.message_history import MessageHistory
+from ..channels.channel import ChannelType
 
 class CliAgent(Agent):
 

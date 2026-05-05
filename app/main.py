@@ -6,10 +6,10 @@ import logging
 import os
 
 from . import config
-from .app_logging import setup_logging, log
-from .setup import ensure_home_dir, migrate_db_path
-from .cli import input_loop
-from .cli_agent import CliAgent
+from .infra.app_logging import setup_logging, log
+from .infra.setup import ensure_home_dir, migrate_db_path
+from .cli.cli import input_loop
+from .cli.cli_agent import CliAgent
 from .bg_server import start_server
 
 from dotenv import load_dotenv

@@ -12,7 +12,7 @@ from unittest.mock import patch, MagicMock, AsyncMock
 
 import app.config as config_module
 from app.main import main
-from app.app_logging import log as app_log
+from app.infra.app_logging import log as app_log
 
 
 def _make_llm_response(content: str) -> MagicMock:
@@ -48,8 +48,8 @@ async def test_cli_with_simple_prompt(capsys):
     original_log_level = app_log.level
     try:
         with patch("sys.argv", ["prog", "cli", "-p", "say hello", "--silent"]), \
-             patch("app.agent.Client") as MockClient, \
-             patch("app.startup.load_system_context", return_value=""), \
+             patch("app.core.agent.Client") as MockClient, \
+             patch("app.infra.startup.load_system_context", return_value=""), \
              patch("app.main.config.load"), \
              patch.object(config_module, "_config", {"model": "test-model"}):
 

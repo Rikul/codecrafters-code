@@ -2,7 +2,7 @@ import os
 import pytest
 from unittest.mock import patch, MagicMock
 
-from app.client import Client
+from app.core.client import Client
 
 
 def test_client_raises_when_no_api_key():
@@ -13,7 +13,7 @@ def test_client_raises_when_no_api_key():
 
 
 def test_client_get_client_returns_openai_instance():
-    with patch("app.client.AsyncOpenAI") as MockOpenAI:
+    with patch("app.core.client.AsyncOpenAI") as MockOpenAI:
         mock_instance = MagicMock()
         MockOpenAI.return_value = mock_instance
         client = Client(api_key="test-key", base_url="https://example.com")
@@ -21,13 +21,13 @@ def test_client_get_client_returns_openai_instance():
 
 
 def test_client_uses_provided_base_url():
-    with patch("app.client.AsyncOpenAI") as MockOpenAI:
+    with patch("app.core.client.AsyncOpenAI") as MockOpenAI:
         Client(api_key="test-key", base_url="https://custom.api.com")
         MockOpenAI.assert_called_once_with(api_key="test-key", base_url="https://custom.api.com")
 
 
 def test_client_uses_default_base_url_when_not_set():
     with patch.dict(os.environ, {"LLM_BASE_URL": ""}, clear=False):
-        with patch("app.client.AsyncOpenAI") as MockOpenAI:
+        with patch("app.core.client.AsyncOpenAI") as MockOpenAI:
             Client(api_key="test-key")
             MockOpenAI.assert_called_once()
