@@ -1,4 +1,4 @@
-from app.channel import Channel
+from .channel import Channel
 from dataclasses import dataclass, field
 
 @dataclass

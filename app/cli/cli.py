@@ -1,4 +1,4 @@
-from .term_display import ANSI
+from ..infra.term_display import ANSI
 import asyncio
 
 def ask_permission(tool_name: str, args: dict) -> bool:

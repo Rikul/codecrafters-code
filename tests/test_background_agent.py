@@ -2,10 +2,10 @@ import pytest
 from unittest.mock import patch, MagicMock, AsyncMock
 
 import app.config as config
-from app.background_agent import BackgroundAgent
-from app.channel import ChannelType
-from app.message import IncomingMessage
-from app.message_queue import MessageQueue
+from app.core.background_agent import BackgroundAgent
+from app.channels.channel import ChannelType
+from app.channels.message import IncomingMessage
+from app.channels.message_queue import MessageQueue
 
 # Mock Channel instance (Channel is now an ABC, not an enum)
 _mock_channel = MagicMock()
@@ -32,11 +32,11 @@ def make_mock_client(tool_calls=None, content="Hello!", finish_reason="stop"):
 
 def make_agent(max_iterations=10):
     mq = MessageQueue()
-    with patch("app.agent.Client") as MockClient:
+    with patch("app.core.agent.Client") as MockClient:
         mock_openai = make_mock_client()
         MockClient.return_value.get_client.return_value = mock_openai
-        with patch("app.agent.load_system_context", return_value="You are a helpful assistant."):
-            with patch("app.background_agent.MessageHistory") as MockHistory:
+        with patch("app.core.agent.load_system_context", return_value="You are a helpful assistant."):
+            with patch("app.core.background_agent.MessageHistory") as MockHistory:
                 MockHistory.return_value.get_history.return_value = []
                 agent = BackgroundAgent(mq=mq, channel=_mock_channel, max_iterations=max_iterations)
     agent.client = mock_openai
@@ -57,10 +57,10 @@ def test_agent_initializes_with_empty_messages():
 
 def test_agent_initializes_with_system_context():
     mq = MessageQueue()
-    with patch("app.agent.Client") as MockClient:
+    with patch("app.core.agent.Client") as MockClient:
         MockClient.return_value.get_client.return_value = MagicMock()
-        with patch("app.agent.load_system_context", return_value="system prompt"):
-            with patch("app.background_agent.MessageHistory") as MockHistory:
+        with patch("app.core.agent.load_system_context", return_value="system prompt"):
+            with patch("app.core.background_agent.MessageHistory") as MockHistory:
                 MockHistory.return_value.get_history.return_value = []
                 agent = BackgroundAgent(mq=mq, channel=_mock_channel)
     assert len(agent.messages) == 1
@@ -70,10 +70,10 @@ def test_agent_initializes_with_system_context():
 
 def test_agent_stores_channel_and_mq():
     mq = MessageQueue()
-    with patch("app.agent.Client") as MockClient:
+    with patch("app.core.agent.Client") as MockClient:
         MockClient.return_value.get_client.return_value = MagicMock()
-        with patch("app.agent.load_system_context", return_value=""):
-            with patch("app.background_agent.MessageHistory") as MockHistory:
+        with patch("app.core.agent.load_system_context", return_value=""):
+            with patch("app.core.background_agent.MessageHistory") as MockHistory:
                 MockHistory.return_value.get_history.return_value = []
                 agent = BackgroundAgent(mq=mq, channel=_mock_channel)
     assert agent.channel == _mock_channel
@@ -102,7 +102,7 @@ async def test_agent_loop_raises_on_empty_choices():
     mock_response.choices = []
     mock_client.chat.completions.create = AsyncMock(return_value=mock_response)
 
-    with patch("app.background_agent.asyncio.sleep", new_callable=AsyncMock) as mock_sleep:
+    with patch("app.core.background_agent.asyncio.sleep", new_callable=AsyncMock) as mock_sleep:
         with pytest.raises(RuntimeError, match="No choices in API response after 5 retries"):
             await agent.agent_loop("Hello")
     assert mock_sleep.call_count == 5
@@ -141,7 +141,7 @@ async def test_agent_loop_respects_max_iterations():
     mock_response.choices = [mock_choice]
     mock_client.chat.completions.create = AsyncMock(return_value=mock_response)
 
-    with patch("app.background_agent.run_tool", return_value="hi\n"):
+    with patch("app.core.background_agent.run_tool", return_value="hi\n"):
         await agent.agent_loop("run forever")
 
     assert mock_client.chat.completions.create.call_count == 3
@@ -176,7 +176,7 @@ async def test_agent_loop_runs_tool_and_sends_final_reply():
 
     mock_client.chat.completions.create = AsyncMock(side_effect=[response_with_tool, response_plain])
 
-    with patch("app.background_agent.run_tool", return_value="hi\n") as mock_run_tool:
+    with patch("app.core.background_agent.run_tool", return_value="hi\n") as mock_run_tool:
         await agent.agent_loop("say hi", metadata={"chat_id": 42})
 
     mock_run_tool.assert_called_once_with(tool_name="bash", tool_args={"command": "echo hi"})
@@ -216,7 +216,7 @@ async def test_agent_loop_sends_inline_content_with_tool_calls():
 
     mock_client.chat.completions.create = AsyncMock(side_effect=[response_with_tool, response_plain])
 
-    with patch("app.background_agent.run_tool", return_value="hi\n"):
+    with patch("app.core.background_agent.run_tool", return_value="hi\n"):
         await agent.agent_loop("run something")
 
     messages = []
@@ -236,10 +236,10 @@ async def test_agent_loop_clears_stopped_after_completion():
     local_channel.channel_type = ChannelType.TELEGRAM
     local_channel.has_stopped = False
 
-    with patch("app.agent.Client") as MockClient:
+    with patch("app.core.agent.Client") as MockClient:
         MockClient.return_value.get_client.return_value = make_mock_client()
-        with patch("app.agent.load_system_context", return_value=""):
-            with patch("app.background_agent.MessageHistory") as MockHistory:
+        with patch("app.core.agent.load_system_context", return_value=""):
+            with patch("app.core.background_agent.MessageHistory") as MockHistory:
                 MockHistory.return_value.get_history.return_value = []
                 agent = BackgroundAgent(mq=mq, channel=local_channel, max_iterations=10)
     agent.client = make_mock_client()

@@ -1,15 +1,15 @@
 import pytest
 from unittest.mock import patch, MagicMock, AsyncMock
 
-from app.channel import ChannelType
-from app.message import OutgoingMessage
-from app.message_queue import MessageQueue
-from app.telegram_channel import TelegramChannel
+from app.channels.channel import ChannelType
+from app.channels.message import OutgoingMessage
+from app.channels.message_queue import MessageQueue
+from app.channels.telegram import TelegramChannel
 
 
 def make_telegram_channel(allow_from=None):
     mq = MessageQueue()
-    with patch("app.telegram_channel.ApplicationBuilder"):
+    with patch("app.channels.telegram.ApplicationBuilder"):
         tc = TelegramChannel(mq=mq, bot_token="test-token", allow_from=allow_from)
     return tc, mq
 
@@ -18,7 +18,7 @@ def make_telegram_channel(allow_from=None):
 
 def test_registers_delivery_function():
     mq = MessageQueue()
-    with patch("app.telegram_channel.ApplicationBuilder"):
+    with patch("app.channels.telegram.ApplicationBuilder"):
         tc = TelegramChannel(mq=mq, bot_token="test-token")
     # register(self, fn) uses the channel object as the key
     assert tc in mq._delivery

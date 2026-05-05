@@ -3,7 +3,7 @@ from typing import Callable, Awaitable
 from .channel import Channel
 from .message import IncomingMessage, OutgoingMessage
 
-from .app_logging import log
+from ..infra.app_logging import log
 
 # callback type: receives outbound message and delivers it
 DeliveryFn = Callable[[OutgoingMessage], Awaitable[None]]

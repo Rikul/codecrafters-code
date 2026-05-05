@@ -1,23 +1,23 @@
 import os
 
-from .app_logging import log
-from .helpers import trunc_str_with_ellipsis
-from .tools.read_file import ReadFileTool
-from .tools.write_file import WriteFileTool
-from .tools.bash import BashTool
-from .tools.web_fetch import WebFetchTool
-from .tools.get_skills_dir import GetSkillsDirTool
-from .tools.todo import TodoAddTool, TodoListTool, TodoClearTool, TodoUpdateTool
-from .tools.calculator import CalculatorTool
-from .tools.hackernews import HackerNewsTool
+from ..infra.app_logging import log
+from ..infra.helpers import trunc_str_with_ellipsis
+from ..tools.read_file import ReadFileTool
+from ..tools.write_file import WriteFileTool
+from ..tools.bash import BashTool
+from ..tools.web_fetch import WebFetchTool
+from ..tools.get_skills_dir import GetSkillsDirTool
+from ..tools.todo import TodoAddTool, TodoListTool, TodoClearTool, TodoUpdateTool
+from ..tools.calculator import CalculatorTool
+from ..tools.hackernews import HackerNewsTool
 
-from .tools.web_search import WebSearchText
-from .tools.web_search import WebSearchImages
-from .tools.web_search import WebSearchVideos
-from .tools.web_search import WebSearchNews
-from .tools.web_search import WebSearchBooks
+from ..tools.web_search import WebSearchText
+from ..tools.web_search import WebSearchImages
+from ..tools.web_search import WebSearchVideos
+from ..tools.web_search import WebSearchNews
+from ..tools.web_search import WebSearchBooks
 
-from .tools.sched_tasks_tool import ListScheduledTasks, AddScheduledTask, UpdateScheduledTask, \
+from ..tools.sched_tasks_tool import ListScheduledTasks, AddScheduledTask, UpdateScheduledTask, \
                         RemoveScheduledTask, GetScheduledTaskOutput
 
 import json

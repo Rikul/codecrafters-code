@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import json
 
-from . import config
-from .app_logging import log
+from .. import config
+from ..infra.app_logging import log
 from .agent import Agent
 
 

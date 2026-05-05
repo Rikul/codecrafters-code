@@ -1,6 +1,6 @@
-from ..app_logging import log
-from .tool import Tool
-from ..scheduled_tasks import ScheduledTasks
+from ..infra.app_logging import log
+from ..core.tool import Tool
+from ..core.scheduled_tasks import ScheduledTasks
 
 class ListScheduledTasks(Tool):
     

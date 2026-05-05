@@ -2,10 +2,10 @@ import asyncio
 import os
 
 from . import config
-from .app_logging import log
-from .background_agent import BackgroundAgent
-from .message_queue import MessageQueue
-from .scheduled_tasks import ScheduledTasks
+from .infra.app_logging import log
+from .core.background_agent import BackgroundAgent
+from .channels.message_queue import MessageQueue
+from .core.scheduled_tasks import ScheduledTasks
 
 
 async def start_server() -> None:
@@ -27,7 +27,7 @@ async def start_server() -> None:
             log.error("Telegram BOT_TOKEN not set in config, skipping Telegram channel")
             return
 
-        from .telegram_channel import TelegramChannel
+        from .channels.telegram import TelegramChannel
         telegram_channel = TelegramChannel(mq, bot_token=bot_token, allow_from=config.telegram.get("ALLOW_FROM", []))
 
     if not telegram_channel:

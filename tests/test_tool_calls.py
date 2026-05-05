@@ -1,5 +1,5 @@
 
-from app.tool_calls import run_tool, tool_registry
+from app.core.tool_calls import run_tool, tool_registry
 
 
 def test_tool_registry_contains_expected_tools():
