@@ -9,6 +9,8 @@ from .cli import ask_permission
 from ..core.agent import Agent, MAX_CONTEXT_MESSAGES
 from ..infra.message_history import MessageHistory
 from ..channels.channel import ChannelType
+from ..infra.startup import load_system_context
+
 
 class CliAgent(Agent):
 
@@ -21,9 +23,12 @@ class CliAgent(Agent):
 
     async def agent_loop(self, message: str,  metadata: dict = None) -> None:
         self._trim_messages()
+
         self.history.add_message("user", message)
 
-        session_messages = self.messages[:] + [{"role": "user", "content": message}]
+        system_context = load_system_context()
+        system = [{"role": "system", "content": system_context}] if system_context else []
+        session_messages = system + self.messages[:] + [{"role": "user", "content": message}]
         iteration = 0
         assistant_message = ""
         while iteration < self.max_iterations:

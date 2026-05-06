@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 
 from .client import Client
-from ..infra.startup import load_system_context
 
 MAX_CONTEXT_MESSAGES = 100
 
@@ -13,21 +12,9 @@ class Agent(ABC):
         self.messages: list[dict] = []
         self.max_iterations = max_iterations
 
-        system_context = load_system_context()
-        if system_context:
-            self.messages.append({"role": "system", "content": system_context})
-
     def _trim_messages(self) -> None:
-        """Keep system message + last MAX_CONTEXT_MESSAGES messages."""
-        if self.messages and self.messages[0]["role"] == "system":
-            system = self.messages[:1]
-            rest = self.messages[1:]
-        else:
-            system = []
-            rest = self.messages
-
-        if len(rest) > MAX_CONTEXT_MESSAGES:
-            self.messages = system + rest[-MAX_CONTEXT_MESSAGES:]
+        if len(self.messages) > MAX_CONTEXT_MESSAGES:
+            self.messages = self.messages[-MAX_CONTEXT_MESSAGES:]
 
     @staticmethod
     def _serialize_assistant_msg(msg) -> dict:
