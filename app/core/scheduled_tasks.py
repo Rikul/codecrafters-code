@@ -169,7 +169,7 @@ class ScheduledTasks:
         if self._mq:
             channel = self._channels.get(task["delivery_channel"])
             if channel:
-                from .message import OutgoingMessage
+                from ..channels.message import OutgoingMessage
                 await self._mq.outgoing_msg(OutgoingMessage(content=output, channel=channel, metadata=self._default_metadata))
             else:
                 log.warning(f"Delivery channel '{task['delivery_channel']}' not found for task '{name}'")
